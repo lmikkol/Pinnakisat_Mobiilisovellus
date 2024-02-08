@@ -1,0 +1,67 @@
+{
+  "users": [
+    {
+      "id": "f5de",
+      "username": "waall",
+      "email": "pieru123@pylly.com",
+      "password": "pöö123",
+      "confirmPassword": "pöö123"
+    },
+    {
+      "id": "ebfa",
+      "username": "waall",
+      "email": "pieru122@pylly.com",
+      "password": "pöö123",
+      "confirmPassword": "pöö123"
+    },
+    {
+      "id": "ba83",
+      "username": "waall",
+      "email": "ghgjghg@gg.fi",
+      "password": "",
+      "confirmPassword": ""
+    },
+    {
+      "id": "e582",
+      "username": "djhdh",
+      "email": "ghjjjhg@gg.fi",
+      "password": "moiks",
+      "confirmPassword": "moiks"
+    },
+    {
+      "id": "66ae",
+      "username": "",
+      "email": "klgjkltjb@pekkapouta.fi",
+      "password": "ggggg",
+      "confirmPassword": "ggggg"
+    },
+    {
+      "id": "5155",
+      "username": "gngm",
+      "email": "klgjkltjp@pekkapouta.fi",
+      "password": "ggggg",
+      "confirmPassword": "ggggg"
+    },
+    {
+      "id": "b6af",
+      "username": "waall",
+      "email": "pieru1@pylly.com",
+      "password": "kkkk",
+      "confirmPassword": "kkkk"
+    },
+    {
+      "id": "0d71",
+      "username": "waall",
+      "email": "pieru123@pylly.fi",
+      "password": "gggg",
+      "confirmPassword": "gggg"
+    },
+    {
+      "id": "20bb",
+      "username": "waall",
+      "email": "Pieru@123pylly.fi",
+      "password": "gggg",
+      "confirmPassword": "gggg"
+    }
+  ]
+}
