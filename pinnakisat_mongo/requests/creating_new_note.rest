@@ -1,0 +1,10 @@
+// HTTP POST request to the specified URL
+POST http://localhost:3001/api/notes 
+
+// Specifying the content type as JSON 
+Content-Type: application/json        
+
+{                                      // Request body containing JSON data
+  "content": "Ensure that everything still works",  // Content of the note
+  "important": true                   // Importance flag of the note
+}
