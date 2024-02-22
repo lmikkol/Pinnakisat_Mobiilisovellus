@@ -1,0 +1,14 @@
+POST http://localhost:3001/api/contests
+Content-Type: application/json
+
+{
+		"name": "Talvipihapinnakisa 2021 - 2022",
+		"description": "Jo 16. perättäinen talvipihapinnakisa. PiLYn toiminta-alueella...",
+		"date_begin": "2021-12-01",
+		"date_end": "2022-02-28",
+		"url": "http://www.pily.fi/event/talvipihapinnakisa-ja-talvikauden-lajien-laskenta-pirkanmaalla-alkavat-tiistaina-1-12-osallistu-sinakin/",
+		"status": "archived"
+}
+
+
+// pyynnöt kilpailujen lisäykselle
