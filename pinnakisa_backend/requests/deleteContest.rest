@@ -1,2 +1,2 @@
 // pyynnöt kilpailujen poistamiselle
-DELETE http://localhost:3001/api/contests/65d4f5402ea14c029497c968
+DELETE http://localhost:3001/api/contests/65d4f10e8ef0330ee0fe42b1
