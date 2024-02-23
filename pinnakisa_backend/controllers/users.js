@@ -2,6 +2,9 @@ const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const User = require('../models/user')
 
+
+// käsittelelee käyttäjätunnuksen luomista
+// hashaa salasanan
 usersRouter.post('/', async (request, response) => {
   const { email, firstName, lastName, password } = request.body
  

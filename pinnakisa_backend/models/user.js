@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 
+// Luodaan käyttäjän skeema, jossa määritellään vaatimuksia käyttäjätunnuksen luontia varten
 const userSchema = mongoose.Schema({
   email: {
     type: String,

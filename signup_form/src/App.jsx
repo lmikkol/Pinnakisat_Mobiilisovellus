@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import FormHeader from './components/FormHeader'
-import FormFields from './components/FormFields'
+import FormHeader from './component/FormHeader'
+import FormFields from './component/FormFields'
 
 const RegistrationForm = () => 
 {

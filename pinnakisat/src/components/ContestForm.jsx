@@ -1,18 +1,7 @@
 import CustomInput from "./CustomInput"
 
 const ContestForm = ({handleSubmit, handleInputChange, contestFormData }) => {
-  //   return(
-  //     <form onSubmit={addContest}>
-  //       <div>
-  //           Kilpailun nimi: <input value={newContest}
-  //           onChange={handleContestChange}/>
-  //       </div>
-  //       <div>
-  //         <button type="submit">Tallenna</button>
-  //       </div>
-  //     </form>
-  //   )
-  // }
+ 
   return(
   <form onSubmit={handleSubmit}>
         <CustomInput

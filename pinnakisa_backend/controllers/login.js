@@ -3,8 +3,11 @@ const bcrypt = require('bcrypt')
 const loginRouter = require('express').Router()
 const User = require('../models/user')
 
+// Vastaa käyttäjän sisäänkirjautumisesta
 loginRouter.post('/', async (request, response) => {
-  const { email, password } = request.body
+    console.log(request.body.loginFormData)
+
+  const {email, password} = request.body.loginFormData
 
   const user = await User.findOne({ email })
   const passwordCorrect = user === null
@@ -22,11 +25,16 @@ loginRouter.post('/', async (request, response) => {
     id: user._id,
   }
 
-  const token = jwt.sign(userForToken, process.env.SECRET)
+  // luo käyttäjälle auto-generoidun tokenin
+  const token = jwt.sign(
+    userForToken,
+     process.env.SECRET,
+     { expiresIn: 60*60})
 
+    console.log("TOKEENN", token)
   response
     .status(200)
-    .send({ token, email: user.email})
+    .send({ token, name: user.email})
 })
 
 module.exports = loginRouter

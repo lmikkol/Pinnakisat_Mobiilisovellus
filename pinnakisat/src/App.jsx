@@ -5,7 +5,8 @@ import Header from './components/Header'
 import Contests from './components/Contests'
 import ContestForm from './components/ContestForm'
 import contestService from './services/contests'
-import CustomInput from './components/CustomInput'
+import loginService from './services/login'
+import LoginForm from './components/LoginForm'
 
 
 const App = () => {
@@ -21,9 +22,18 @@ const App = () => {
     url: '',
     status: ''
   }
+
+  // Sisältää tiedot kirjautumiselle eli spostin joka toimii käyttäjätunnuksena sekä salasanan
+  const loginCredentials = {
+    email: '',
+    password: ''
+  }
+
   // const [newContest, setNewContest] = useState('')
   const [contests, setContests] = useState([])
   const [contestFormData, setContestFormData] = useState(contestInit)
+  const [loginFormData, setLoginFormData] = useState(loginCredentials)
+  const [user, setUser] = useState(null)
 
   // Gets and displays the array objects
   useEffect(() => {
@@ -35,7 +45,6 @@ const App = () => {
       })
   }, [])
 
-  
   // Handles the inputs change on content change  
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -60,25 +69,71 @@ const App = () => {
       })
   };
 
+  // Käsittelee inputin muutoksia
+  const handleLoginInputChange = (event) => {
+    const { name, value } = event.target;
+    setLoginFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  }
+
+  // Kirjautumisen käsittelijä
+  const handleLogin = async (event) => {
+    event.preventDefault()
+
+    try {
+      const loggedUser = await loginService.login({
+        loginFormData
+      })
+
+      setUser(loggedUser)
+      setLoginFormData(loginCredentials)
+    } catch (exception) {
+      console.log('Wrong credentials', exception)
+    }
+  }
+
   // Handles the button clicks on so called NavForm
   // will be changed overtime
   const handler = () => {
     console.log(' was pressed')
   }
 
+  // Palauttaa kirjautumisen lomakkeen
+  const loginForm = () => {
+    return (
+      <><h2>Kirjaudu</h2><div>
+        <LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} />
+
+      </div></>
+    )
+  }
+
+  const contestForm = () => {
+    return (
+      <ContestForm handleSubmit={handleSubmit} handleInputChange={handleInputChange} contestFormData={contestFormData} />
+    )
+  }
+
   return (
 
     <div>
+
       <Header header={Header} />
       <NavigationBar handler={handler} />
+
+      {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
+      {!user && loginForm()}
+      {user && contestForm()}
+
+
       <h2>Kilpailut</h2>
       <div>
         {contests.map(contest =>
           <Contests key={contest.id} contest={contest} />
         )}
       </div>
-      <ContestForm handleSubmit={handleSubmit} handleInputChange={handleInputChange} contestFormData={contestFormData}/>
-      {/* <ContestForm addContest={addContest} newContest={newContest} newDescription={newDescription} handleContestChange={handleContestChange}/> */}
     </div>
   )
 }
