@@ -35,6 +35,16 @@ const App = () => {
   const [loginFormData, setLoginFormData] = useState(loginCredentials)
   const [user, setUser] = useState(null)
 
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedPinnakisaUser')
+    if(loggedUserJSON !== null) {
+      console.log(loggedUserJSON, "TESTII")
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      contestService.setToken(user.token)
+    }
+  }, [])
+
   // Gets and displays the array objects
   useEffect(() => {
     contestService
@@ -87,11 +97,21 @@ const App = () => {
         loginFormData
       })
 
+      window.localStorage.setItem(
+        'loggedPinnakisaUser', JSON.stringify(loggedUser)
+      )
+
+      contestService.setToken(loggedUser.token)
       setUser(loggedUser)
       setLoginFormData(loginCredentials)
     } catch (exception) {
       console.log('Wrong credentials', exception)
     }
+  }
+
+  const handleLogOut = () => {
+    window.localStorage.removeItem('loggedPinnakisaUser')
+    setUser(null)
   }
 
   // Handles the button clicks on so called NavForm
@@ -121,7 +141,7 @@ const App = () => {
     <div>
 
       <Header header={Header} />
-      <NavigationBar handler={handler} />
+      <NavigationBar handler={handler} handleLogOut={handleLogOut} />
 
       {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
       {!user && loginForm()}

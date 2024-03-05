@@ -1,4 +1,4 @@
-const NavigationBar = ({ handler }) => {
+const NavigationBar = ({ handler, handleLogOut }) => {
 
     return (
         <table>
@@ -15,6 +15,9 @@ const NavigationBar = ({ handler }) => {
                     </td>
                     <td>
                         <button onClick={() => handler()}>Kirjaudu</button>
+                    </td>
+                    <td>
+                    <button onClick={() => handleLogOut()}>Kirjaudu ulos</button>
                     </td>
                 </tr>
             </tbody>
