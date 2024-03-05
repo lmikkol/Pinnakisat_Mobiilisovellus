@@ -26,11 +26,19 @@ const contestSchema = new mongoose.Schema({
 	status: {
 		type: String,
 		required: true
+	},
+
+	//Lisätty uutena
+	participants: [
+	{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User'
 	}
+]
 },
-{
-	timestamps: true
-})
+	{
+		timestamps: true
+	})
 
 // muotoilee mongoosen palauttamat oliot toJson-metodin avulla merkkijonoksi
 // sekä poistaa MongoDBn oletusarvoista olioiden muotoilua

@@ -5,16 +5,16 @@ const NavigationBar = ({ handler, handleLogOut }) => {
             <tbody>
                 <tr>
                     <td>
-                        <button onClick={() => handler()}>Etusivu</button>
+                        <button onClick={() => handler(1)}>Etusivu</button>
                     </td>
                     <td>
-                        <button onClick={() => handler()}>Kilpailut</button>
+                        <button onClick={() => handler(1)}>Kilpailut</button>
                     </td>
                     <td>
-                        <button onClick={() => handler()}>Rekisteröidy</button>
+                        <button onClick={() => handler(1)}>Rekisteröidy</button>
                     </td>
                     <td>
-                        <button onClick={() => handler()}>Kirjaudu</button>
+                        <button onClick={() => handler(1)}>Kirjaudu</button>
                     </td>
                     <td>
                     <button onClick={() => handleLogOut()}>Kirjaudu ulos</button>

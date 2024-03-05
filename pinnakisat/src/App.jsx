@@ -35,6 +35,7 @@ const App = () => {
   const [loginFormData, setLoginFormData] = useState(loginCredentials)
   const [user, setUser] = useState(null)
 
+  //Sets logged user
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedPinnakisaUser')
     if(loggedUserJSON !== null) {
@@ -100,6 +101,7 @@ const App = () => {
       window.localStorage.setItem(
         'loggedPinnakisaUser', JSON.stringify(loggedUser)
       )
+      console.log(loggedUser, "lägges")
 
       contestService.setToken(loggedUser.token)
       setUser(loggedUser)
@@ -109,6 +111,7 @@ const App = () => {
     }
   }
 
+  // user logs out
   const handleLogOut = () => {
     window.localStorage.removeItem('loggedPinnakisaUser')
     setUser(null)
@@ -116,16 +119,26 @@ const App = () => {
 
   // Handles the button clicks on so called NavForm
   // will be changed overtime
-  const handler = () => {
-    console.log(' was pressed')
+  const handler = (id) => {
+    console.log(id, ' was pressed')
   }
+
+  const handleAddUser = async (contestId) => {
+    console.log(user.id, contestId)
+    try {
+      await contestService.addUserToContest(contestId, user.id);
+      console.log('User added to contest successfully');
+    } catch (error) {
+      console.error('Error adding user to contest:', error);
+      console.log('An error occurred while adding user to contest');
+    }
+  };
 
   // Palauttaa kirjautumisen lomakkeen
   const loginForm = () => {
     return (
       <><h2>Kirjaudu</h2><div>
         <LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} />
-
       </div></>
     )
   }
@@ -133,6 +146,19 @@ const App = () => {
   const contestForm = () => {
     return (
       <ContestForm handleSubmit={handleSubmit} handleInputChange={handleInputChange} contestFormData={contestFormData} />
+    )
+  }
+
+  // FILTTERÖI VAIN KÄYTTÄJÄN KISAT
+  const userContests = () => {
+    return (
+      <><h2>Käyttäjän kilpailut</h2><div>
+         <div>
+        {contests.map(contest =>
+          <Contests key={contest.id} contest={contest} handleAddUser={handleAddUser}/>
+        )}
+      </div>
+      </div></>
     )
   }
 
@@ -151,14 +177,11 @@ const App = () => {
       <h2>Kilpailut</h2>
       <div>
         {contests.map(contest =>
-          <Contests key={contest.id} contest={contest} />
+          <Contests key={contest.id} contest={contest} handleAddUser={handleAddUser}/>
         )}
       </div>
     </div>
   )
 }
-
-
-
 
 export default App

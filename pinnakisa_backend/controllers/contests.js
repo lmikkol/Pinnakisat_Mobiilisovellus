@@ -1,12 +1,44 @@
 const contestRouter = require('express').Router()
 const Contest = require('../models/contest')
-
+const User = require('../models/user')
 // kysely, joka hakee kaikki tauluun lisätyt kilpailut
-contestRouter.get('/', (request, response) => {
-	Contest.find({}).then(contests => {
+contestRouter.get('/', async (request, response) => {
+	// Contest.find({}).then(contests => {
+		// })
+		const contests = await Contest
+		.find({}).populate('participants', { email: 1, firstName: 1 })
 		response.json(contests)
-	})
 })
+
+
+contestRouter.put('/contest/:contestId/adduser/:userId', (req, res) => {
+    const contestId = req.params.contestId;
+    const userId = req.params.userId;
+
+    console.log(contestId, userId, "BÄÄKKK")
+  
+    // Update the contest document by pushing the user's ID to the users array
+    Contest.findByIdAndUpdate(contestId, { $push: { participants: userId } }, { new: true })
+      .then(updatedContest => {
+        if (!updatedContest) {
+          return res.status(404).json({ message: 'Contest not found' });
+        }
+  
+        // Update the user document by pushing the contest's ID to the contests array
+        return User.findByIdAndUpdate(userId, { $push: { contests: contestId } }, { new: true })
+      })
+      .then(updatedUser => {
+        if (!updatedUser) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+  
+        return res.status(200).json({ message: 'User added to contest successfully' });
+      })
+      .catch(error => {
+        console.error('Error adding user to contest:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+      });
+  });
 
 // kysely kilpailujen lisäykselle
 contestRouter.post('/', (request, response, next) => {

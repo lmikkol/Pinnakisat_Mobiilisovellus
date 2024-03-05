@@ -29,7 +29,13 @@ const userSchema = mongoose.Schema({
     type: Number,
     required: true,
     default: 1
-  }
+  },
+  contests: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Contest'
+    }
+  ]
 })
 
 userSchema.set('toJSON', {

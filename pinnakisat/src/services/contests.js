@@ -34,4 +34,19 @@ const updateContest = (id, newObject) => {
     return request.then(response => response.data)
   }
 
-export default { getAll, createContest, deleteContest, updateContest, setToken}
+  const addUserToContest = async (contestId, userId) => {
+    axios.put(`${baseUrl}/contest/${contestId}/adduser/${userId}`, {})
+      .then(response => {
+        if (response.status === 200) {
+          console.log('User added to contest successfully');
+        } else {
+          console.log('Failed to add user to contest');
+        }
+      })
+      .catch(error => {
+        console.error('Error adding user to contest:', error);
+        console.log('An error occurred while adding user to contest');
+      });
+  };
+
+export default { getAll, createContest, deleteContest, updateContest, setToken, addUserToContest}
