@@ -14,15 +14,6 @@ import {groupedOptions, sorsalinnut, kanalinnut, kuikkalinnut, uikkulinnut, ulap
   } from './data/birds'
 import Select from 'react-select'
 
-
-
-
-
-
-
-
-
-
 const App = () => {
 
   // form for objects, used by contestFormData
