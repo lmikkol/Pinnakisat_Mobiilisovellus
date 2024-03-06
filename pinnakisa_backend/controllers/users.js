@@ -30,7 +30,7 @@ usersRouter.post('/', async (request, response) => {
 })
 
 usersRouter.get('/', async (request, response) => {
-    const users = await User.find({}).populate('contests', {name: 1})
+    const users = await User.find({}).populate('contests', {name: 1, description: 1})
     response.json(users)
   })
 

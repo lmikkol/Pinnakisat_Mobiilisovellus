@@ -7,6 +7,20 @@ import ContestForm from './components/ContestForm'
 import contestService from './services/contests'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
+import SelectReact from './components/SelectReact'
+import {groupedOptions, sorsalinnut, kanalinnut, kuikkalinnut, uikkulinnut, ulappalinnut, pelikaanilinnut, haikaralinnut,
+  päiväpetolinnut, jalohaukkalinnut, kurkilinnut, rantalinnut, hietakanalinnut, kyyhkylinnut,
+   käkilinnut, pöllölinnut, kehrääjälinnut, kirskulinnut, säihkylinnut, tikkalinnut, varpuslinnut
+  } from './data/birds'
+import Select from 'react-select'
+
+
+
+
+
+
+
+
 
 
 const App = () => {
@@ -34,6 +48,9 @@ const App = () => {
   const [contestFormData, setContestFormData] = useState(contestInit)
   const [loginFormData, setLoginFormData] = useState(loginCredentials)
   const [user, setUser] = useState(null)
+  const [selectedOption, setSelectedOption] = useState(null);
+
+
 
   //Sets logged user
   useEffect(() => {
@@ -55,6 +72,12 @@ const App = () => {
         console.log(initialContests, "CONTESTSSSS")
       })
   }, [])
+
+  const options = [
+    { value: 'kyhmyjoutsen', label: 'Kyhmyjoutsen' },
+    { value: 'pikkujoutsen', label: 'Pikkujoutsen' },
+    { value: 'laulujoutsen',  label: 'Laulujoutsen' },
+  ];
 
   // Handles the inputs change on content change  
   const handleInputChange = (event) => {
@@ -151,33 +174,50 @@ const App = () => {
 
   // FILTTERÖI VAIN KÄYTTÄJÄN KISAT
   const userContests = () => {
+    const results = contests.filter(contest => user.contests.includes(contest.id))
+
     return (
       <><h2>Käyttäjän kilpailut</h2><div>
          <div>
-        {contests.map(contest =>
+         {results.map(contest =>
           <Contests key={contest.id} contest={contest} handleAddUser={handleAddUser}/>
         )}
+        
       </div>
       </div></>
     )
   }
 
+  
   return (
 
     <div>
-
       <Header header={Header} />
       <NavigationBar handler={handler} handleLogOut={handleLogOut} />
 
       {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
+      {user && userContests()}
       {!user && loginForm()}
       {user && contestForm()}
 
+      
+      <h2>Havainnot</h2>
+      <form onSubmit={handler}>
+      <Select
+        value={selectedOption}
+        isMulti={true}
+        onChange={handler}
+        options={groupedOptions}
+        getOptionLabel={(option) => option.fi}
+      />
+      <button>Tallenna</button>
+      </form>
 
+      <SelectReact handler={handler} selectedOption={selectedOption} setSelectedOption={setSelectedOption} options={options}/>
       <h2>Kilpailut</h2>
       <div>
         {contests.map(contest =>
-          <Contests key={contest.id} contest={contest} handleAddUser={handleAddUser}/>
+          <Contests key={contest.id} contest={contest} handleAddUser={handleAddUser} handler={handler}/>
         )}
       </div>
     </div>
@@ -185,3 +225,4 @@ const App = () => {
 }
 
 export default App
+
