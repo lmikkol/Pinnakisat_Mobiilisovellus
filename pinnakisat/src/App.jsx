@@ -7,7 +7,7 @@ import ContestForm from './components/ContestForm'
 import contestService from './services/contests'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
-import SightingsForm from './components/SightingsForm'
+
 
 const App = () => {
 
