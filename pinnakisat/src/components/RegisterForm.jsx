@@ -1,11 +1,12 @@
 import CustomInput from "./CustomInput"
 
-const LoginForm = ({handleLogin, handleLoginInputChange, loginFormData }) => {
+
+
+/// JATKA TÄSTÄ
+
+const RegisterForm = ({handleLogin, handleLoginInputChange, loginFormData }) => {
  
     return(
-      <div>
-        <h2>Kirjaudu</h2>
-      
     <form onSubmit={handleLogin}>
           <CustomInput
             onChange={handleLoginInputChange}
@@ -27,8 +28,7 @@ const LoginForm = ({handleLogin, handleLoginInputChange, loginFormData }) => {
           <button type="submit">Kirjaudu</button>
   
         </form>
-        </div>
     )
   }
 
-  export default LoginForm
+  export default RegisterForm

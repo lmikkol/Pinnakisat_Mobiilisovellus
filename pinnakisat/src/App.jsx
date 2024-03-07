@@ -7,21 +7,7 @@ import ContestForm from './components/ContestForm'
 import contestService from './services/contests'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
-import SelectReact from './components/SelectReact'
-import {groupedOptions, sorsalinnut, kanalinnut, kuikkalinnut, uikkulinnut, ulappalinnut, pelikaanilinnut, haikaralinnut,
-  päiväpetolinnut, jalohaukkalinnut, kurkilinnut, rantalinnut, hietakanalinnut, kyyhkylinnut,
-   käkilinnut, pöllölinnut, kehrääjälinnut, kirskulinnut, säihkylinnut, tikkalinnut, varpuslinnut
-  } from './data/birds'
-import Select from 'react-select'
-
-
-
-
-
-
-
-
-
+import SightingsForm from './components/SightingsForm'
 
 const App = () => {
 
@@ -55,7 +41,7 @@ const App = () => {
   //Sets logged user
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedPinnakisaUser')
-    if(loggedUserJSON !== null) {
+    if (loggedUserJSON !== null) {
       console.log(loggedUserJSON, "TESTII")
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
@@ -72,12 +58,6 @@ const App = () => {
         console.log(initialContests, "CONTESTSSSS")
       })
   }, [])
-
-  const options = [
-    { value: 'kyhmyjoutsen', label: 'Kyhmyjoutsen' },
-    { value: 'pikkujoutsen', label: 'Pikkujoutsen' },
-    { value: 'laulujoutsen',  label: 'Laulujoutsen' },
-  ];
 
   // Handles the inputs change on content change  
   const handleInputChange = (event) => {
@@ -160,9 +140,7 @@ const App = () => {
   // Palauttaa kirjautumisen lomakkeen
   const loginForm = () => {
     return (
-      <><h2>Kirjaudu</h2><div>
-        <LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} />
-      </div></>
+      <LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} />
     )
   }
 
@@ -178,21 +156,18 @@ const App = () => {
 
     return (
       <><h2>Käyttäjän kilpailut</h2><div>
-         <div>
-         {results.map(contest =>
-          <Contests key={contest.id} contest={contest} handleAddUser={handleAddUser}/>
-        )}
-        
-      </div>
+        <div>
+          <Contests contests={results} handleAddUser={handleAddUser} handler={handler} />
+        </div>
       </div></>
     )
   }
 
-  
+
   return (
 
     <div>
-      <Header header={Header} />
+      <Header header={"Pinnakisapalvelu"} />
       <NavigationBar handler={handler} handleLogOut={handleLogOut} />
 
       {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
@@ -200,26 +175,8 @@ const App = () => {
       {!user && loginForm()}
       {user && contestForm()}
 
-      
-      <h2>Havainnot</h2>
-      <form onSubmit={handler}>
-      <Select
-        value={selectedOption}
-        isMulti={true}
-        onChange={handler}
-        options={groupedOptions}
-        getOptionLabel={(option) => option.fi}
-      />
-      <button>Tallenna</button>
-      </form>
-
-      <SelectReact handler={handler} selectedOption={selectedOption} setSelectedOption={setSelectedOption} options={options}/>
-      <h2>Kilpailut</h2>
-      <div>
-        {contests.map(contest =>
-          <Contests key={contest.id} contest={contest} handleAddUser={handleAddUser} handler={handler}/>
-        )}
-      </div>
+      <SightingsForm handler={handler} selectedOption={selectedOption} />
+      <Contests contests={contests} handleAddUser={handleAddUser} handler={handler} />
     </div>
   )
 }

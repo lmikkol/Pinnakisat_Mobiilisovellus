@@ -1,9 +1,9 @@
 import pilyLogo from '../pilyLogo.jpeg'
 
-const Header = () => {
+const Header = ({header}) => {
     return (
       <div>
-        <h1>Pinnakisapalvelu</h1>
+        <h1>{header}</h1>
         <img src={pilyLogo} alt="pilylogo"/>
       </div>
     )
