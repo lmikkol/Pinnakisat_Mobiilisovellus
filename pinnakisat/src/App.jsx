@@ -7,7 +7,9 @@ import ContestForm from './components/ContestForm'
 import contestService from './services/contests'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
+import RegisterForm from './components/RegisterForm'
 import SightingsForm from './components/SightingsForm'
+import userService from './services/userService'
 
 
 const App = () => {
@@ -30,25 +32,34 @@ const App = () => {
     password: ''
   }
 
+  const registerCredentials = {
+    email: '',
+    firstName: '',
+    lastName: '',
+    password: ''
+  }
+
   // const [newContest, setNewContest] = useState('')
   const [contests, setContests] = useState([])
   const [contestFormData, setContestFormData] = useState(contestInit)
   const [loginFormData, setLoginFormData] = useState(loginCredentials)
-  const [user, setUser] = useState(null)
+  const [registerFormData, setRegisterFormData] = useState(registerCredentials)
+  const [loggedinUser, setUser] = useState(null)
   const [selectedOption, setSelectedOption] = useState(null);
+  const [userContest, setUserContest] = useState([]);
 
 
 
-  //Sets logged user
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedPinnakisaUser')
     if (loggedUserJSON !== null) {
-      console.log(loggedUserJSON, "TESTII")
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       contestService.setToken(user.token)
     }
+   
   }, [])
+
 
   // Gets and displays the array objects
   useEffect(() => {
@@ -56,9 +67,10 @@ const App = () => {
       .getAll()
       .then(initialContests => {
         setContests(initialContests)
-        console.log(initialContests, "CONTESTSSSS")
       })
   }, [])
+  //Sets logged user
+
 
   // Handles the inputs change on content change  
   const handleInputChange = (event) => {
@@ -73,16 +85,23 @@ const App = () => {
   // creating a new contest object on click
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(contestFormData);
-
     contestService
       .createContest(contestFormData)
       .then(returnedContest => {
         setContests(contests.concat(returnedContest))
+        setUserContest(userContest.concat(returnedContest))
         setContestFormData(contestInit)
-        console.log('happening')
       })
   };
+
+  // lisätty uutena testailua varten...
+  const handleRegisterInputChange = (event) => {
+    const { name, value } = event.target;
+    setRegisterFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  }
 
   // Käsittelee inputin muutoksia
   const handleLoginInputChange = (event) => {
@@ -91,6 +110,22 @@ const App = () => {
       ...prevFormData,
       [name]: value,
     }));
+  }
+
+  // lisätty uutena testailua varten...
+  const handleRegistration = async (event) => {
+    event.preventDefault()
+
+    try {
+      const registeredUser = await userService.createUser({
+        registerFormData
+      })
+
+      setUser(registeredUser)
+      setLoginFormData(registerCredentials)
+    } catch (exception) {
+      console.log('Something went wrong..', exception)
+    }
   }
 
   // Kirjautumisen käsittelijä
@@ -105,15 +140,20 @@ const App = () => {
       window.localStorage.setItem(
         'loggedPinnakisaUser', JSON.stringify(loggedUser)
       )
-      console.log(loggedUser, "lägges")
 
       contestService.setToken(loggedUser.token)
       setUser(loggedUser)
       setLoginFormData(loginCredentials)
+      const results = contests.filter(contest => loggedUser.contests.includes(contest.id))
+      setUserContest(results)
     } catch (exception) {
       console.log('Wrong credentials', exception)
     }
   }
+
+  useEffect(() => {
+    window.localStorage.setItem('loggedPinnakisaUser', JSON.stringify(loggedinUser))
+  })
 
   // user logs out
   const handleLogOut = () => {
@@ -128,10 +168,17 @@ const App = () => {
   }
 
   const handleAddUser = async (contestId) => {
-    console.log(user.id, contestId)
+    console.log(loggedinUser.id, contestId)
     try {
-      await contestService.addUserToContest(contestId, user.id);
-      console.log('User added to contest successfully');
+      const updatedUser = await userService.addContest(contestId, loggedinUser.id)
+     // const updatedUserContests = [...userContest, contests.find(contest => contest.id === contestId)];
+     // console.log(updatedUserContests, "UPDATED LIST")
+     // setUserContest(updatedUserContests);
+      setUser(prevUser => ({
+        ...prevUser,
+        contests: [...prevUser.contests, contestId]
+      }))
+
     } catch (error) {
       console.error('Error adding user to contest:', error);
       console.log('An error occurred while adding user to contest');
@@ -151,10 +198,17 @@ const App = () => {
     )
   }
 
+  const registerForm = () => {
+    return (
+      <div>
+        <RegisterForm handleRegistration={handleRegistration} handleRegisterInputChange={handleRegisterInputChange} registerFormData={registerFormData} />
+      </div>
+    )
+  }
+
   // FILTTERÖI VAIN KÄYTTÄJÄN KISAT
   const userContests = () => {
-    const results = contests.filter(contest => user.contests.includes(contest.id))
-
+    const results = contests.filter(contest => loggedinUser.contests.includes(contest.id))
     return (
       <><h2>Käyttäjän kilpailut</h2><div>
         <div>
@@ -172,9 +226,11 @@ const App = () => {
       <NavigationBar handler={handler} handleLogOut={handleLogOut} />
 
       {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
-      {user && userContests()}
-      {!user && loginForm()}
-      {user && contestForm()}
+      {loggedinUser && userContests()}
+      {!loggedinUser && loginForm()}
+      {!loggedinUser && registerForm()}
+      {loggedinUser && contestForm()}
+
 
       <SightingsForm handler={handler} selectedOption={selectedOption} />
       <Contests contests={contests} handleAddUser={handleAddUser} handler={handler} />

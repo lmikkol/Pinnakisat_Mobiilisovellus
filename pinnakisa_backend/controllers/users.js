@@ -6,8 +6,29 @@ const Contest = require('../models/contest')
 
 // käsittelelee käyttäjätunnuksen luomista
 // hashaa salasanan
+
+usersRouter.put('/joincontest/:contestId/:userId', async (req, res) => {
+  const contestId = req.params.contestId;
+  const userId = req.params.userId;
+   // Update the user document by pushing the contest's ID to the contests array
+   User.findByIdAndUpdate(userId, { $push: { contests: contestId } }, { new: true }).populate('contests', {name: 1, description: 1})
+   .then(updatedUser => {
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.json(updatedUser) 
+  })
+  .catch(error => {
+    console.error('Error adding user to contest:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  });
+})
+
+
 usersRouter.post('/', async (request, response) => {
-  const { email, firstName, lastName, password } = request.body
+  console.log(request.body.registerFormData)
+  const { email, firstName, lastName, password } = request.body.registerFormData
  
 //   if(email === process.env.ADMIN_EMAIL) {
     

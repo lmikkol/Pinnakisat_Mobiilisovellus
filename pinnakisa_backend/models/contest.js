@@ -26,15 +26,7 @@ const contestSchema = new mongoose.Schema({
 	status: {
 		type: String,
 		required: true
-	},
-
-	//Lisätty uutena
-	participants: [
-	{
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User'
 	}
-]
 },
 	{
 		timestamps: true

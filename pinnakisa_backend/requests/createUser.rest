@@ -8,3 +8,15 @@ Content-Type: application/json
     "lastName": "dude",
     "password": "basicM"
 }
+
+###
+
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "email": "testUser@testing.com",
+    "firstName": "test",
+    "lastName": "mate",
+    "password": "testinG"
+}

@@ -2,15 +2,19 @@ const contestRouter = require('express').Router()
 const Contest = require('../models/contest')
 const User = require('../models/user')
 // kysely, joka hakee kaikki tauluun lisätyt kilpailut
+
 contestRouter.get('/', async (request, response) => {
 	// Contest.find({}).then(contests => {
 		// })
 		const contests = await Contest
-		.find({}).populate('participants', { email: 1, firstName: 1 })
+		.find({})
 		response.json(contests)
 })
 
 
+
+
+/// MUUTA TÄMÄ KOKONAAN
 contestRouter.put('/contest/:contestId/adduser/:userId', (req, res) => {
     const contestId = req.params.contestId;
     const userId = req.params.userId;
@@ -18,21 +22,21 @@ contestRouter.put('/contest/:contestId/adduser/:userId', (req, res) => {
     console.log(contestId, userId, "BÄÄKKK")
   
     // Update the contest document by pushing the user's ID to the users array
-    Contest.findByIdAndUpdate(contestId, { $push: { participants: userId } }, { new: true })
+    Contest.findByIdAndUpdate(contestId, { $push: { participants: userId } }, { new: true }).populate('participants', { email: 1, firstName: 1 })
       .then(updatedContest => {
+		console.log(updatedContest.populated('participants')) // null
         if (!updatedContest) {
           return res.status(404).json({ message: 'Contest not found' });
         }
   
         // Update the user document by pushing the contest's ID to the contests array
-        return User.findByIdAndUpdate(userId, { $push: { contests: contestId } }, { new: true })
-      })
-      .then(updatedUser => {
+        User.findByIdAndUpdate(userId, { $push: { contests: contestId } }, { new: true }).populate('contests', {name: 1, description: 1})
+      }).then(updatedUser => {
         if (!updatedUser) {
           return res.status(404).json({ message: 'User not found' });
         }
   
-        return res.status(200).json({ message: 'User added to contest successfully' });
+        response.json(updatedUser) 
       })
       .catch(error => {
         console.error('Error adding user to contest:', error);
@@ -70,7 +74,7 @@ contestRouter.get('/:id', (request, response) => {
 		if (contest) {
 			response.json(contest)
 		} else {
-			response.status(404).end
+			response.status(404).end()
 		}
 	})
 })

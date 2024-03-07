@@ -6,8 +6,5 @@ const getSightings = () => {
     return request.then(response => response.data)
 }
 
-const addSighting = (newObject) => {
-    
-}
 
 export default { getSightings }
