@@ -11,6 +11,7 @@ import RegisterForm from './components/RegisterForm'
 import userService from './services/userService'
 import Notification from './components/Notification'
 import AddBirdModal from './components/AddBirdModal'
+import sightingService from './services/sightings'
 const App = () => {
 
 
@@ -49,6 +50,7 @@ const App = () => {
   const [userContest, setUserContest] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null)
   const [showModal, setShowModal] = useState(false);
+  const [sightings, setSighting] = useState({})
 
   const handleShowModal = () => setShowModal(true);
 
@@ -82,6 +84,20 @@ const App = () => {
       ...prevFormData,
       [name]: value,
     }));
+  };
+
+
+    // Handles submit buttons functionality
+  // creating a new contest object on click
+  const handleSightingAdd = (event) => {
+    event.preventDefault();
+    console.log("ONNISTUI SAATANA", sightings)
+    sightingService
+       .createSighting(sightings)
+       .then(returnedSighting => {
+        console.log(returnedSighting)
+        setSighting({})
+       })
   };
 
   // Handles submit buttons functionality
@@ -240,7 +256,7 @@ const App = () => {
     // FILTTERÖI VAIN KÄYTTÄJÄN KISAT
     const birdSightModal = () => {
       return (
-        <AddBirdModal showModal={showModal} setShowModal={setShowModal} contest={contest} user={loggedinUser}/>
+        <AddBirdModal showModal={showModal} setShowModal={setShowModal} contest={contest} user={loggedinUser} setSighting={setSighting} handleSightingAdd={handleSightingAdd} />
       )
     }
 

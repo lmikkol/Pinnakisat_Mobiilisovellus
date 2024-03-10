@@ -17,12 +17,12 @@ sightingsRouter.post('/', (request, response, next) => {
 
 	const sighting = new Sighting({
 		region: body.region,
-		distanceKM: body.distanceKM,
+		distanceKM: body.kilometers,
 		hours: body.hours,
 		spontaneous: body.spontaneous,
-        contest: body.contest,
-        userAccount: body.userAccount,
-        birdList: body.birdList
+        contest: body.contestId,
+        userAccount: body.userId,
+        birdList: body.birds
 	})
 
 	// tallentaa luodun olion tietokantaan

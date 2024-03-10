@@ -13,7 +13,7 @@ import {
 
 
 
-function AddBirdModal({ showModal, setShowModal, contest, user }) {
+function AddBirdModal({ showModal, setShowModal, contest, user, setSighting, handleSightingAdd }) {
   const handleCloseModal = () => setShowModal(false);
 
 
@@ -86,6 +86,8 @@ function AddBirdModal({ showModal, setShowModal, contest, user }) {
       hours: contestFormData.hours,
       birds: addingBirds
     }
+    setSighting(newObject)
+    handleSightingAdd(event)
     addingBirds = []
     console.log("NEW", newObject)
 

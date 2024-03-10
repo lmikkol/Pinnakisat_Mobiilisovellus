@@ -1,10 +1,28 @@
 import axios from "axios";
-const baseUrl = '/api/contests'
+const baseUrl = '/api/sightings'
+
+
+
+let token = null
+
+const setToken = newToken => {
+    token = `Bearer ${newToken}`
+  }
+
 
 const getSightings = () => {
     const request = axios.get(baseUrl)
     return request.then(response => response.data)
 }
 
+const createSighting = async newObject => {
+    const config = {
+      headers: { Authorization: token},
+    }
 
-export default { getSightings }
+    const response = await axios.post(baseUrl, newObject, config)
+    return response.data
+  }
+
+
+export default { getSightings, createSighting, setToken }
