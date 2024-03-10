@@ -8,11 +8,14 @@ import contestService from './services/contests'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import RegisterForm from './components/RegisterForm'
-import SightingsForm from './components/SightingsForm'
 import userService from './services/userService'
+import Notification from './components/Notification'
+import AddBirdForm from './components/AddBirdForm'
+import Button from 'react-bootstrap/Button';
 
 
 const App = () => {
+
 
   // form for objects, used by contestFormData
   // when submit button is pressed
@@ -45,8 +48,9 @@ const App = () => {
   const [loginFormData, setLoginFormData] = useState(loginCredentials)
   const [registerFormData, setRegisterFormData] = useState(registerCredentials)
   const [loggedinUser, setUser] = useState(null)
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState([]);
   const [userContest, setUserContest] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null)
 
 
 
@@ -146,13 +150,21 @@ const App = () => {
       setLoginFormData(loginCredentials)
       const results = contests.filter(contest => loggedUser.contests.includes(contest.id))
       setUserContest(results)
-    } catch (exception) {
-      console.log('Wrong credentials', exception)
+    } catch (error) {
+      console.log('Wrong credentials', error)
+      setErrorMessage(
+        `Wrong credentials`
+      )
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 3000)
     }
   }
 
   useEffect(() => {
-    window.localStorage.setItem('loggedPinnakisaUser', JSON.stringify(loggedinUser))
+    if(loggedinUser || loggedinUser !== null){
+      window.localStorage.setItem('loggedPinnakisaUser', JSON.stringify(loggedinUser))
+    }
   })
 
   // user logs out
@@ -163,9 +175,16 @@ const App = () => {
 
   // Handles the button clicks on so called NavForm
   // will be changed overtime
-  const handler = (id) => {
-    console.log(id, ' was pressed')
+  const handler = (event) => {
+    event.preventDefault()
+    console.log(selectedOption, ' was selected')
+    setSelectedOption(selectedOption)
   }
+
+  // const handleSightSubmit = (event) => {
+  //   event.preventDefault()
+    
+  // }
 
   const handleAddUser = async (contestId) => {
     console.log(loggedinUser.id, contestId)
@@ -184,6 +203,7 @@ const App = () => {
       console.log('An error occurred while adding user to contest');
     }
   };
+
 
   // Palauttaa kirjautumisen lomakkeen
   const loginForm = () => {
@@ -220,10 +240,17 @@ const App = () => {
 
 
   return (
+    <><div>
+      
 
-    <div>
       <Header header={"Pinnakisapalvelu"} />
       <NavigationBar handler={handler} handleLogOut={handleLogOut} />
+      <Notification message={errorMessage} />
+
+      <AddBirdForm />
+    
+
+
 
       {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
       {loggedinUser && userContests()}
@@ -231,10 +258,9 @@ const App = () => {
       {!loggedinUser && registerForm()}
       {loggedinUser && contestForm()}
 
-
-      <SightingsForm handler={handler} selectedOption={selectedOption} />
       <Contests contests={contests} handleAddUser={handleAddUser} handler={handler} />
-    </div>
+
+    </div></>
   )
 }
 

@@ -6,6 +6,10 @@
     margin: auto;
   }
 
+.div {
+  align-items: center;
+}
+
 img {
     object-fit: contain;
     height: 10px;

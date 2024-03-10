@@ -1,12 +1,13 @@
+
 const ContestItem = ({contest, handleAddUser, handler}) => {
   return (
-    <div>
-      <h3>{contest.name}</h3>
-      <p className="p">{contest.description}</p>
-      <button onClick={() => handleAddUser(contest.id)}>Osallistu</button>
-      <button onClick={() => handler()}>Lisätietoja</button>
-      <hr/>
-    </div>
+<div>
+<h3>{contest.name}</h3>
+<p className="p">{contest.description}</p>
+<button onClick={() => handleAddUser(contest.id)}>Osallistu</button>
+<button onClick={() => handler()}>Lisätietoja</button>
+<hr/>
+</div>
   )
 }
 
@@ -23,3 +24,5 @@ const Contests = ({contests, handleAddUser, handler }) => {
 }
 
 export default Contests
+
+
