@@ -1,0 +1,29 @@
+POST http://localhost:3001/api/sightings
+Content-Type: application/json
+
+{
+	"region": "Tampere",
+	"distanceKM": "69",
+    "hours": "24",
+    "spontaneous": "0",
+    "contest": "65edc0fa4db8f95db486d907",
+    "userAccount": "65d7392653194cabf21ba73b"
+}
+
+###
+
+POST http://localhost:3001/api/sightings
+Content-Type: application/json
+
+{
+	"region": "Tampere",
+	"distanceKM": "69",
+    "hours": "24",
+    "spontaneous": "0",
+    "contest": "65edc0fa4db8f95db486d907",
+    "userAccount": "65d7392653194cabf21ba73b",
+    "birdList" : [{
+        "name": "Joutsen",
+        "date": "20.04.2240"
+    }]
+}
