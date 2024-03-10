@@ -1,5 +1,5 @@
 
-import Alert from '@mui/material/Alert';
+import { Alert } from 'react-bootstrap'
 import Stack from '@mui/material/Stack';
 
 const Notification = ({ message }) => {
@@ -11,7 +11,8 @@ const Notification = ({ message }) => {
   return (
     <div>
       <Stack sx={{ width: '100%' }} spacing={2}>
-        <Alert severity="error">{message}</Alert>
+      <Alert variant="danger">
+       {message}</Alert>
       </Stack>
     </div>
   )

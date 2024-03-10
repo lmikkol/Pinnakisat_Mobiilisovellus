@@ -10,10 +10,7 @@ import LoginForm from './components/LoginForm'
 import RegisterForm from './components/RegisterForm'
 import userService from './services/userService'
 import Notification from './components/Notification'
-import AddBirdForm from './components/AddBirdForm'
-import Button from 'react-bootstrap/Button';
-
-
+import AddBirdModal from './components/AddBirdModal'
 const App = () => {
 
 
@@ -51,7 +48,9 @@ const App = () => {
   const [selectedOption, setSelectedOption] = useState([]);
   const [userContest, setUserContest] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null)
+  const [showModal, setShowModal] = useState(false);
 
+  const handleShowModal = () => setShowModal(true);
 
 
   useEffect(() => {
@@ -238,7 +237,14 @@ const App = () => {
     )
   }
 
+    // FILTTERÖI VAIN KÄYTTÄJÄN KISAT
+    const birdSightModal = () => {
+      return (
+        <AddBirdModal showModal={showModal} setShowModal={setShowModal} contest={contest} user={loggedinUser}/>
+      )
+    }
 
+  const [contest, setContest] = useState(null)
   return (
     <><div>
       
@@ -247,18 +253,15 @@ const App = () => {
       <NavigationBar handler={handler} handleLogOut={handleLogOut} />
       <Notification message={errorMessage} />
 
-      <AddBirdForm />
-    
-
-
 
       {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
       {loggedinUser && userContests()}
       {!loggedinUser && loginForm()}
       {!loggedinUser && registerForm()}
       {loggedinUser && contestForm()}
+      {loggedinUser && birdSightModal()}
 
-      <Contests contests={contests} handleAddUser={handleAddUser} handler={handler} />
+      <Contests contests={contests} handleAddUser={handleAddUser} setContest={setContest} handleShowModal={handleShowModal} showModal={showModal}/>
 
     </div></>
   )

@@ -6,7 +6,8 @@ const DynamicInputForm = ({ list }) => {
     userId: '',
     contestId: '',
     kilometers: '',
-    spoded: '',
+    spontaneous: '',
+    region: '',
     birds: []
 }
 
@@ -53,7 +54,7 @@ const handleSelectChange = (index, event) => {
         userId: 1,
         contestId: 2,
         kilometers: contestFormData.kilometers,
-        spoded: contestFormData.spoded,
+        spontaneous: contestFormData.spontaneous,
         birds: addingBirds
     }
     addingBirds = []
@@ -64,6 +65,7 @@ const handleSelectChange = (index, event) => {
 
 return (
   <form onSubmit={handleSubmit}>
+
     {list.map((item, index) => (
       <div key={index}>
         <label>{list[index].label}</label>
@@ -86,11 +88,11 @@ return (
 
     <CustomInput
       onChange={handleSecInputChange}
-      value={contestFormData.spoded}
-      name="spoded"
+      value={contestFormData.spontaneous}
+      name="spontaneous"
       type={'text'}
-      placeholder={'spoded'}
-      inputTitle={"spoded"}
+      placeholder={'spondet'}
+      inputTitle={'spondet'}
     />
 
 

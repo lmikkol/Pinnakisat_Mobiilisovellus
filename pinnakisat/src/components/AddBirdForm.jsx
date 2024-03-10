@@ -15,11 +15,9 @@ const AddBirdForm = () => {
     return(
         <div>
         <SightingsForm handler={handler} setSelectedOption={setSelectedOption} selectedOption={selectedOption} />
-
         <h2>Valitut linnut</h2>
       {selectedOption.length === 0 ? (
         <p>Select an option</p>
-        
       ) : (
         <div>
             <DynamicInputForm list = {selectedOption}></DynamicInputForm>
