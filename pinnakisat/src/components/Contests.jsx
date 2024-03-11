@@ -1,4 +1,14 @@
 import Button from 'react-bootstrap/Button'
+import {
+  BrowserRouter as Router,
+  Routes, 
+  Route,
+  Link,
+  Navigate,
+  useParams,
+  useNavigate,
+} from 'react-router-dom'
+
 const ContestItem = ({contest, handleAddUser, setContest, handleShowModal}) => {
 
   const TEST = ({event}) => {
@@ -30,8 +40,8 @@ const Contests = ({contests, handleAddUser, setContest, handleShowModal }) => {
     <div>
         <h2>Kilpailut</h2>
       {contests.map(contest =>
-        <ContestItem key={contest.id} contest={contest} handleAddUser={handleAddUser} setContest={setContest} handleShowModal={handleShowModal}/>
-      )}
+        <ContestItem key={contest.id} contest={contest} handleAddUser={handleAddUser} setContest={setContest} handleShowModal={handleShowModal} />
+        )}
     </div>
   )
 }

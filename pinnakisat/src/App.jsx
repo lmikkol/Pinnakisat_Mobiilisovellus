@@ -12,8 +12,23 @@ import userService from './services/userService'
 import Notification from './components/Notification'
 import AddBirdModal from './components/AddBirdModal'
 import sightingService from './services/sightings'
+import NavBar from './components/NavigationBar'
+import {
+  BrowserRouter as Router,
+  Routes, 
+  Route,
+  Link,
+  Navigate,
+  useParams,
+  useNavigate,
+} from 'react-router-dom'
+
 const App = () => {
 
+
+  const padding = {
+    padding: 5
+  }
 
   // form for objects, used by contestFormData
   // when submit button is pressed
@@ -150,6 +165,9 @@ const App = () => {
   // Kirjautumisen käsittelijä
   const handleLogin = async (event) => {
     event.preventDefault()
+    // const navigate = useNavigate()
+    // event.onLogin(loggedinUser.email)
+    // navigate('/')
 
     try {
       const loggedUser = await loginService.login({
@@ -196,10 +214,7 @@ const App = () => {
     setSelectedOption(selectedOption)
   }
 
-  // const handleSightSubmit = (event) => {
-  //   event.preventDefault()
-    
-  // }
+
 
   const handleAddUser = async (contestId) => {
     console.log(loggedinUser.id, contestId)
@@ -266,18 +281,48 @@ const App = () => {
       
 
       <Header header={"Pinnakisapalvelu"} />
-      <NavigationBar handler={handler} handleLogOut={handleLogOut} />
+      <Router>
+			<div>
+				<i>Pinnakisapalvelu, jossa käyttäjät voivat osallistua kilpailuihin ja lisätä lintuhavaintojaan.</i>
+			</div>
+			<div>
+				{/* <Link style={padding} to="/">Etusivu</Link> */}
+				<Link style={padding} to="/">Etusivu</Link>
+				<Link style={padding} to="/contests">Kilpailut</Link>
+				<Link style={padding} to="/registration">Rekisteröidy</Link>
+				<Link style={padding} to="/login">Kirjaudu</Link>
+				{loggedinUser
+					? <em>{loggedinUser} logged in</em>
+					: <Link style={padding} to="/login">login</Link>
+				}
+				{/* <Link style={padding} to="/logout">LogOut</Link> */}
+			</div>
+
+			<Routes>
+				<Route path="/" component={App} />
+				<Route path="/contests" element={<Contests contests={contests} handleAddUser={handleAddUser} setContest={setContest} handleShowModal={handleShowModal} showModal={showModal} />} />
+				<Route path="/registration" element={<RegisterForm handleRegistration={handleRegistration} handleRegisterInputChange={handleRegisterInputChange} registerFormData={registerFormData} />} />
+				<Route path="/login" element={<LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} />} />
+        {/* <Route path="/logout" element={handleLogOut}/> */}
+			</Routes>
+		</Router>
+
+      <NavBar Contests={Contests} contests={contests} handleAddUser={handleAddUser} setContest={setContest}
+      handleShowModal={handleShowModal} showModal={showModal} RegisterForm={RegisterForm} handleRegistration={handleRegistration} handleRegisterInputChange={handleRegisterInputChange}
+	registerFormData={registerFormData} LoginForm={LoginForm} handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} loggedinUser={loggedinUser}/>
+
+      {/* <NavigationBar handler={handler} handleLogOut={handleLogOut} /> */}
       <Notification message={errorMessage} />
 
 
       {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
-      {loggedinUser && userContests()}
+      {/* {loggedinUser && userContests()}
       {!loggedinUser && loginForm()}
       {!loggedinUser && registerForm()}
       {loggedinUser && contestForm()}
-      {loggedinUser && birdSightModal()}
+      {loggedinUser && birdSightModal()} */}
 
-      <Contests contests={contests} handleAddUser={handleAddUser} setContest={setContest} handleShowModal={handleShowModal} showModal={showModal}/>
+      {/* <Contests contests={contests} handleAddUser={handleAddUser} setContest={setContest} handleShowModal={handleShowModal} showModal={showModal}/> */}
 
     </div></>
   )

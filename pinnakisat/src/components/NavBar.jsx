@@ -25,4 +25,6 @@ const NavigationBar = ({ handler, handleLogOut }) => {
     )
 }
 
+
+
 export default NavigationBar
