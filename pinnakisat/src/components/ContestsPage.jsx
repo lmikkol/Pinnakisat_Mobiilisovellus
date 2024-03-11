@@ -1,0 +1,42 @@
+
+import ContestCard from './ContestCard';
+import Stack from 'react-bootstrap/Stack';
+
+
+
+const styles = {
+  grid: {
+      paddingLeft: 0,
+      paddingRight: 0
+  },
+  row: {
+      marginBottom: 12
+  },
+  col: {
+      paddingLeft: 0,
+      paddingRight: 0
+  }
+};
+
+
+const ContestsPage = ({contests, handleAddUser, loggedinUser }) => {
+
+    return (
+    <div>
+      <Stack gap={1}>
+      {contests.map(contest =>  
+          <>
+          <div className="p-2">
+          <ContestCard contest={contest} handleAddUser={handleAddUser} loggedinUser={loggedinUser} />
+					</div>
+					</>
+        )}
+    </Stack>
+
+    </div>
+  )
+}
+
+export default ContestsPage
+
+

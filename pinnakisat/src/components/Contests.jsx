@@ -1,4 +1,5 @@
 import Button from 'react-bootstrap/Button'
+import ContestCard from './ContestCard'
 import {
   BrowserRouter as Router,
   Routes, 
@@ -40,7 +41,7 @@ const Contests = ({contests, handleAddUser, setContest, handleShowModal }) => {
     <div>
         <h2>Kilpailut</h2>
       {contests.map(contest =>
-        <ContestItem key={contest.id} contest={contest} handleAddUser={handleAddUser} setContest={setContest} handleShowModal={handleShowModal} />
+        <><ContestItem key={contest.id} contest={contest} handleAddUser={handleAddUser} setContest={setContest} handleShowModal={handleShowModal} /><ContestCard contest={contest} handleAddUser={handleAddUser} /></>
         )}
     </div>
   )
