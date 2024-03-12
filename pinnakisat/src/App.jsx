@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import './App.css'
+import './custom_styles.css'
 import NavigationBar from './components/NavBar'
 import Header from './components/Header'
 import Contests from './components/Contests'
@@ -12,7 +12,12 @@ import userService from './services/userService'
 import Notification from './components/Notification'
 import AddBirdModal from './components/AddBirdModal'
 import sightingService from './services/sightings'
+import ContestsPage from './components/ContestsPage'
+import UserContestsPage from './components/UserContestsPage'
+import UserScorePage from './components/UserScorePage'
 import NavBar from './components/NavigationBar'
+import Button from 'react-bootstrap/Button'
+
 import {
   BrowserRouter as Router,
   Routes, 
@@ -22,10 +27,38 @@ import {
   useParams,
   useNavigate,
 } from 'react-router-dom'
+import login from './services/login'
+
+const Home = () => {
+
+  return(
+  <div>
+    <h2>PLACEHOLDER.</h2>
+  </div>
+  )
+}
+
+const Login = ({handleLogin, setLoginFormData, loginFormData}) => {
+
+  // console.log(loginFormData)
+  const navigate = useNavigate()
+  const handleLoginInputChange = (event) => {
+    const { name, value } = event.target;
+    setLoginFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  }
+  
+  return (
+    <div>
+      <LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} />
+    </div>
+  )
+}
 
 const App = () => {
-
-
+  
   const padding = {
     padding: 5
   }
@@ -55,15 +88,21 @@ const App = () => {
     password: ''
   }
 
+  const notificationInfo = {
+    type: '',
+    message: ''
+  }
+
   // const [newContest, setNewContest] = useState('')
   const [contests, setContests] = useState([])
+  const [scores, setScores] = useState(null)
   const [contestFormData, setContestFormData] = useState(contestInit)
   const [loginFormData, setLoginFormData] = useState(loginCredentials)
   const [registerFormData, setRegisterFormData] = useState(registerCredentials)
   const [loggedinUser, setUser] = useState(null)
   const [selectedOption, setSelectedOption] = useState([]);
   const [userContest, setUserContest] = useState([]);
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [notificationMessage, setNotification] = useState({notificationInfo})
   const [showModal, setShowModal] = useState(false);
   const [sightings, setSighting] = useState({})
 
@@ -89,8 +128,8 @@ const App = () => {
         setContests(initialContests)
       })
   }, [])
-  //Sets logged user
 
+  //Sets logged user
 
   // Handles the inputs change on content change  
   const handleInputChange = (event) => {
@@ -101,6 +140,24 @@ const App = () => {
     }));
   };
 
+  const handleRemoveContestFromUser = async (event) => {
+    //Update userObject in database -> remove refkey based on contest id === event.target.name
+    console.log("TODO", event.target.name)
+    try {
+      // Call a method to remove the contest from the user's contests
+     const updatedUser= await userService.removeContest(event.target.name, loggedinUser.id);
+  
+      // Update the user state to reflect the removal of the contest
+      setUser(prevUser => ({
+        ...prevUser,
+        contests: prevUser.contests.filter(id => id !== event.target.name)
+      }));
+    } catch (error) {
+      console.error('Error removing contest from user:', error);
+      console.log('An error occurred while removing contest from user');
+    }
+
+  }
 
     // Handles submit buttons functionality
   // creating a new contest object on click
@@ -138,37 +195,38 @@ const App = () => {
   }
 
   // Käsittelee inputin muutoksia
-  const handleLoginInputChange = (event) => {
-    const { name, value } = event.target;
-    setLoginFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-  }
+  // const handleLoginInputChange = (event) => {
+  //   const { name, value } = event.target;
+  //   setLoginFormData((prevFormData) => ({
+  //     ...prevFormData,
+  //     [name]: value,
+  //   }));
+  // }
 
   // lisätty uutena testailua varten...
   const handleRegistration = async (event) => {
-    event.preventDefault()
-
+    
     try {
       const registeredUser = await userService.createUser({
         registerFormData
       })
 
-      setUser(registeredUser)
-      setLoginFormData(registerCredentials)
+      console.log("KÄYTTÄJÄ LUOTU", registeredUser)
+      setRegisterFormData({})
+      // setUser(registeredUser)
+      // setLoginFormData(registerCredentials)
     } catch (exception) {
       console.log('Something went wrong..', exception)
     }
   }
 
+  
+
   // Kirjautumisen käsittelijä
   const handleLogin = async (event) => {
     event.preventDefault()
-    // const navigate = useNavigate()
-    // event.onLogin(loggedinUser.email)
-    // navigate('/')
-
+    
+   
     try {
       const loggedUser = await loginService.login({
         loginFormData
@@ -183,15 +241,26 @@ const App = () => {
       setLoginFormData(loginCredentials)
       const results = contests.filter(contest => loggedUser.contests.includes(contest.id))
       setUserContest(results)
+      setNotification({
+        type: "success",
+        message: "Logged In!"
+      })
+      setTimeout(() => {
+        setNotification(notificationInfo)
+      }, 3000)
     } catch (error) {
       console.log('Wrong credentials', error)
-      setErrorMessage(
-        `Wrong credentials`
+      setNotification({
+       type: "warning",
+       message: `Wrong credentials`
+      }
       )
       setTimeout(() => {
-        setErrorMessage(null)
+        setNotification(notificationInfo)
       }, 3000)
     }
+    const navigate = useNavigate();
+    navigate('/');
   }
 
   useEffect(() => {
@@ -214,9 +283,7 @@ const App = () => {
     setSelectedOption(selectedOption)
   }
 
-
-
-  const handleAddUser = async (contestId) => {
+  const handleAddUserContest = async (contestId) => {
     console.log(loggedinUser.id, contestId)
     try {
       const updatedUser = await userService.addContest(contestId, loggedinUser.id)
@@ -234,6 +301,18 @@ const App = () => {
     }
   };
 
+  const handleFindUserContest = async (event) => {
+     const contestId = event.target.name
+     
+    try{
+      const findingUser = await userService.getUserContest(contestId)
+      console.log('löytyi:', findingUser)
+
+    } catch (error) {
+      console.error('Error finding user contest', error)
+      console.log('Error occured while searching for user contest')
+    }
+  }
 
   // Palauttaa kirjautumisen lomakkeen
   const loginForm = () => {
@@ -258,13 +337,18 @@ const App = () => {
 
   // FILTTERÖI VAIN KÄYTTÄJÄN KISAT
   const userContests = () => {
+   
     const results = contests.filter(contest => loggedinUser.contests.includes(contest.id))
     return (
-      <><h2>Käyttäjän kilpailut</h2><div>
         <div>
-          <Contests contests={results} handleAddUser={handleAddUser} handler={handler} />
+          <UserContestsPage contests={results} handleShowModal={handleShowModal} setContest={setContest} handleRemoveContestFromUser={handleRemoveContestFromUser}/>
         </div>
-      </div></>
+    ) 
+  }
+
+  const Contests = () => {
+    return(
+    <ContestsPage contests={contests} handleAddUserContest={handleAddUserContest} loggedinUser={loggedinUser}/> 
     )
   }
 
@@ -275,10 +359,21 @@ const App = () => {
       )
     }
 
+    const contestScores = () => {
+      // const results = contests.filter(contest => loggedinUser.contests.includes(contest.id))
+      return (
+        <div>
+          <UserScorePage contests={contests} handleShowModal={handleShowModal} setContest={setContest} />
+        </div>
+      )
+    }
+
   const [contest, setContest] = useState(null)
+
+  
+
   return (
     <><div>
-      
 
       <Header header={"Pinnakisapalvelu"} />
       <Router>
@@ -289,40 +384,37 @@ const App = () => {
 				{/* <Link style={padding} to="/">Etusivu</Link> */}
 				<Link style={padding} to="/">Etusivu</Link>
 				<Link style={padding} to="/contests">Kilpailut</Link>
-				<Link style={padding} to="/registration">Rekisteröidy</Link>
-				<Link style={padding} to="/login">Kirjaudu</Link>
-				{loggedinUser
-					? <em>{loggedinUser} logged in</em>
-					: <Link style={padding} to="/login">login</Link>
-				}
-				{/* <Link style={padding} to="/logout">LogOut</Link> */}
+				
+				{loggedinUser ? (
+          <><Link style={padding} to="/usercontest">Omat kilpailut</Link>
+          <em>{loggedinUser.name} logged in</em></>
+        ) : (
+          <><Link style={padding} to="/registration">Rekisteröidy</Link>
+          <Link style={padding} to="/login">login</Link></>
+        )}
+
+				{loggedinUser && <Link style={padding} to="/logout">LogOut</Link>}
+        <Link style={padding} to="/contest-scores">Tulokset</Link>
 			</div>
 
 			<Routes>
-				<Route path="/" component={App} />
-				<Route path="/contests" element={<Contests contests={contests} handleAddUser={handleAddUser} setContest={setContest} handleShowModal={handleShowModal} showModal={showModal} />} />
-				<Route path="/registration" element={<RegisterForm handleRegistration={handleRegistration} handleRegisterInputChange={handleRegisterInputChange} registerFormData={registerFormData} />} />
-				<Route path="/login" element={<LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} />} />
-        {/* <Route path="/logout" element={handleLogOut}/> */}
+				<Route path="/" element={<Home />} />
+				<Route path="/contests" element={Contests()} />
+        <Route path="/usercontest" element={loggedinUser && userContests()} />
+				<Route path="/registration" element={registerForm()} />
+				<Route path="/login" element={<><Login handleLogin={handleLogin} setLoginFormData={setLoginFormData} loginFormData={loginFormData} /><Notification message={notificationMessage} /></>} />
+        <Route path="/logout" Component={handleLogOut}/>
+        <Route path="/contest-scores" element={contestScores()}/>
 			</Routes>
 		</Router>
 
-      <NavBar Contests={Contests} contests={contests} handleAddUser={handleAddUser} setContest={setContest}
-      handleShowModal={handleShowModal} showModal={showModal} RegisterForm={RegisterForm} handleRegistration={handleRegistration} handleRegisterInputChange={handleRegisterInputChange}
-	registerFormData={registerFormData} LoginForm={LoginForm} handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} loggedinUser={loggedinUser}/>
-
-      {/* <NavigationBar handler={handler} handleLogOut={handleLogOut} /> */}
-      <Notification message={errorMessage} />
-
+    <Button name="65edc0fa4db8f95db486d907" type="button" className="btn btn-warning" onClick={(event) => handleFindUserContest(event)}>
+            Poistu kisasta
+          </Button>
 
       {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
-      {/* {loggedinUser && userContests()}
-      {!loggedinUser && loginForm()}
-      {!loggedinUser && registerForm()}
       {loggedinUser && contestForm()}
-      {loggedinUser && birdSightModal()} */}
-
-      {/* <Contests contests={contests} handleAddUser={handleAddUser} setContest={setContest} handleShowModal={handleShowModal} showModal={showModal}/> */}
+      {loggedinUser && birdSightModal()} 
 
     </div></>
   )

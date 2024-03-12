@@ -11,8 +11,8 @@ const Notification = ({ message }) => {
   return (
     <div>
       <Stack sx={{ width: '100%' }} spacing={2}>
-      <Alert variant="danger">
-       {message}</Alert>
+      <Alert variant={message.type}>
+       {message.message}</Alert>
       </Stack>
     </div>
   )

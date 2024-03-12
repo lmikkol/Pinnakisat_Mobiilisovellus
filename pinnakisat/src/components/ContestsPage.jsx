@@ -19,15 +19,14 @@ const styles = {
 };
 
 
-const ContestsPage = ({contests, handleAddUser, loggedinUser }) => {
-
+const ContestsPage = ({contests, handleAddUserContest, loggedinUser }) => {
     return (
     <div>
       <Stack gap={1}>
       {contests.map(contest =>  
           <>
           <div className="p-2">
-          <ContestCard contest={contest} handleAddUser={handleAddUser} loggedinUser={loggedinUser} />
+          <ContestCard contest={contest} handleAddUserContest={handleAddUserContest} loggedinUser={loggedinUser} />
 					</div>
 					</>
         )}

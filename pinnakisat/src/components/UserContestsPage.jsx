@@ -17,19 +17,18 @@ const styles = {
 };
 
 
-const UserContestsPage = ({contests, handleShowModal,setContest  }) => {
+const UserContestsPage = ({contests, handleShowModal,setContest , handleRemoveContestFromUser }) => {
   return (
     <div>
       <Stack gap={1}>
       {contests.map(contest =>  
           <>
           <div className="p-2">
-						<UserContestCard contest={contest} handleShowModal={handleShowModal} setContest={setContest} />
+						<UserContestCard contest={contest} handleShowModal={handleShowModal} setContest={setContest} handleRemoveContestFromUser={handleRemoveContestFromUser} />
 					</div>
 					</>
         )}
     </Stack>
-
     </div>
   )
 }

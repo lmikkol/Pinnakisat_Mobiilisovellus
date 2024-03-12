@@ -35,7 +35,14 @@ const userSchema = mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Contest'
     }
-  ]
+  ],
+
+  // sightings: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: 'Sighting'
+  //   }
+  // ]
 })
 
 userSchema.set('toJSON', {

@@ -1,10 +1,11 @@
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button'
 
-function UserContestCard({contest, handleShowModal, setContest, handleRemoveContestFromUser}) {
+function UserScoreCard({handleShowModal, contest, setContest}) {
     console.log(contest)
 
     const TEST = ({event}) => {
+        
         setContest(event.target.name)
         handleShowModal(true)
       }
@@ -17,10 +18,10 @@ function UserContestCard({contest, handleShowModal, setContest, handleRemoveCont
   return (
     <Card style={{ width: '36rem' }}>
       <Card.Body style={{ position: "relative" }}>
-      <Card.Title>{contest.name}</Card.Title>
+      <Card.Title>PLACEHOLDER</Card.Title>
         <Card.Subtitle className="mb-2 text-muted">{datesForm}</Card.Subtitle>
         <Card.Text>
-          {contest.url}
+          <p>PLACEHOLDER TEXT</p>
         </Card.Text> 
         <Button name={contest.id} type="button" className="btn btn-primary mr-1" data-toggle="modal" data-target="#exampleModalScrollable" onClick={(event) => TEST(event = {event})} >
         Lisää uusi havainto
@@ -36,6 +37,4 @@ function UserContestCard({contest, handleShowModal, setContest, handleRemoveCont
   );
 }
 
-
-
-export default UserContestCard;
+export default UserScoreCard
