@@ -7,11 +7,9 @@ contestRouter.get('/', async (request, response) => {
 	// Contest.find({}).then(contests => {
 		// })
 		const contests = await Contest
-		.find({})
+		.find({}).sort([['date_end', -1]]);
 		response.json(contests)
 })
-
-
 
 
 /// MUUTA TÄMÄ KOKONAAN
@@ -47,7 +45,7 @@ contestRouter.put('/contest/:contestId/adduser/:userId', (req, res) => {
 // kysely kilpailujen lisäykselle
 contestRouter.post('/', (request, response, next) => {
 	const body = request.body
-	console.log(body)
+	console.log(body, "CONTEST BAK FOR vertailu")
 
 
 	const contest = new Contest({

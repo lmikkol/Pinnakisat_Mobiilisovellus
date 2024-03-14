@@ -6,7 +6,7 @@ const birdSchema = new mongoose.Schema ({
     date: String 
 })
 
-const sightingSchema = new mongoose.Schema({
+const findingSchema = new mongoose.Schema({
     
     region: {
         type: String,
@@ -25,14 +25,11 @@ const sightingSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Contest'
     },
-    userAccount: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    },
-    birdList: [birdSchema],
+
+    birdList: [birdSchema]
 })
 
-sightingSchema.set('toJSON', {
+findingSchema.set('toJSON', {
     transform: (document, returnedObject) => {
 		returnedObject.id = returnedObject._id.toString()
 		delete returnedObject._id
@@ -40,4 +37,4 @@ sightingSchema.set('toJSON', {
     }
 })
 
-module.exports = mongoose.model('Sighting', sightingSchema)
+module.exports = mongoose.model('Sighting', findingSchema)

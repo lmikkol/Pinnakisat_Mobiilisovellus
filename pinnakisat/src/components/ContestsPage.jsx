@@ -1,8 +1,5 @@
-
 import ContestCard from './ContestCard';
 import Stack from 'react-bootstrap/Stack';
-
-
 
 const styles = {
   grid: {
@@ -19,14 +16,15 @@ const styles = {
 };
 
 
-const ContestsPage = ({contests, handleAddUserContest, loggedinUser }) => {
+const ContestsPage = ({contests, handleAddUserContest, loggedinUser, handleRemoveContestFromUser }) => {
     return (
     <div>
       <Stack gap={1}>
       {contests.map(contest =>  
           <>
           <div className="p-2">
-          <ContestCard contest={contest} handleAddUserContest={handleAddUserContest} loggedinUser={loggedinUser} />
+          {/* <Link to={`/contests/${contest.id}`}>{contest.name}</Link> */}
+          <ContestCard contest={contest} handleAddUserContest={handleAddUserContest} loggedinUser={loggedinUser} handleRemoveContestFromUser={handleRemoveContestFromUser}/>
 					</div>
 					</>
         )}

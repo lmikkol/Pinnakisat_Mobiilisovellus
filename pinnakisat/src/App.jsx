@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import './custom_styles.css'
-import NavigationBar from './components/NavBar'
 import Header from './components/Header'
 import Contests from './components/Contests'
 import ContestForm from './components/ContestForm'
@@ -15,7 +14,6 @@ import sightingService from './services/sightings'
 import ContestsPage from './components/ContestsPage'
 import UserContestsPage from './components/UserContestsPage'
 import UserScorePage from './components/UserScorePage'
-import NavBar from './components/NavigationBar'
 import Button from 'react-bootstrap/Button'
 
 import {
@@ -35,6 +33,14 @@ const Home = () => {
   <div>
     <h2>PLACEHOLDER.</h2>
   </div>
+  )
+}
+
+const addContest = () => {
+  return(
+    <div>
+      <Button>Lisää kilpailu</Button>
+    </div>
   )
 }
 
@@ -106,6 +112,7 @@ const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [sightings, setSighting] = useState({})
 
+
   const handleShowModal = () => setShowModal(true);
 
 
@@ -119,7 +126,6 @@ const App = () => {
    
   }, [])
 
-
   // Gets and displays the array objects
   useEffect(() => {
     contestService
@@ -129,7 +135,13 @@ const App = () => {
       })
   }, [])
 
-  //Sets logged user
+  useEffect(() => {
+    userService
+    .getAllUsers()
+    .then(initialContests => {
+      setUserContest(initialContests)
+    })
+  }, [])
 
   // Handles the inputs change on content change  
   const handleInputChange = (event) => {
@@ -159,18 +171,28 @@ const App = () => {
 
   }
 
-    // Handles submit buttons functionality
-  // creating a new contest object on click
   const handleSightingAdd = (event) => {
     event.preventDefault();
     console.log("ONNISTUI SAATANA", sightings)
-    sightingService
-       .createSighting(sightings)
-       .then(returnedSighting => {
-        console.log(returnedSighting)
-        setSighting({})
-       })
-  };
+  }
+  
+    // Handles submit buttons functionality
+  // creating a new bird sighting object on click
+  // const handleSightingAdd = (event) => {
+
+  //   console.log("ONNISTUI SAATANA", sightings)
+  //   userService.createUserSighting(loggedinUser.id, sightings).then(returnedSighting => {
+  //          console.log(returnedSighting)
+           
+  //   })
+  //   // sightingService
+  //   //    .createSighting(sightings)
+  //   //    .then(returnedSighting => {
+  //   //     console.log(returnedSighting)
+  //   //     setSighting({})
+  //   //    })
+  //   setSighting({})
+  // };
 
   // Handles submit buttons functionality
   // creating a new contest object on click
@@ -194,16 +216,7 @@ const App = () => {
     }));
   }
 
-  // Käsittelee inputin muutoksia
-  // const handleLoginInputChange = (event) => {
-  //   const { name, value } = event.target;
-  //   setLoginFormData((prevFormData) => ({
-  //     ...prevFormData,
-  //     [name]: value,
-  //   }));
-  // }
-
-  // lisätty uutena testailua varten...
+  // Käyttäjän luomisen käsittelijä
   const handleRegistration = async (event) => {
     
     try {
@@ -219,8 +232,6 @@ const App = () => {
       console.log('Something went wrong..', exception)
     }
   }
-
-  
 
   // Kirjautumisen käsittelijä
   const handleLogin = async (event) => {
@@ -245,9 +256,7 @@ const App = () => {
         type: "success",
         message: "Logged In!"
       })
-      setTimeout(() => {
-        setNotification(notificationInfo)
-      }, 3000)
+      settingTimeOut()
     } catch (error) {
       console.log('Wrong credentials', error)
       setNotification({
@@ -255,12 +264,16 @@ const App = () => {
        message: `Wrong credentials`
       }
       )
-      setTimeout(() => {
-        setNotification(notificationInfo)
-      }, 3000)
+      settingTimeOut()
     }
     const navigate = useNavigate();
     navigate('/');
+  }
+
+  const settingTimeOut = () => {
+    setTimeout(() => {
+      setNotification(notificationInfo)
+    }, 3000)
   }
 
   useEffect(() => {
@@ -323,7 +336,7 @@ const App = () => {
 
   const contestForm = () => {
     return (
-      <ContestForm handleSubmit={handleSubmit} handleInputChange={handleInputChange} contestFormData={contestFormData} />
+      <ContestForm handleSubmit={handleSubmit} handleInputChange={handleInputChange} contestFormData={contestFormData}/>
     )
   }
 
@@ -348,29 +361,29 @@ const App = () => {
 
   const Contests = () => {
     return(
-    <ContestsPage contests={contests} handleAddUserContest={handleAddUserContest} loggedinUser={loggedinUser}/> 
+    <ContestsPage contests={contests} handleAddUserContest={handleAddUserContest} loggedinUser={loggedinUser} handleRemoveContestFromUser={handleRemoveContestFromUser}/> 
     )
   }
 
     // FILTTERÖI VAIN KÄYTTÄJÄN KISAT
     const birdSightModal = () => {
       return (
-        <AddBirdModal showModal={showModal} setShowModal={setShowModal} contest={contest} user={loggedinUser} setSighting={setSighting} handleSightingAdd={handleSightingAdd} />
+        <AddBirdModal showModal={showModal} setShowModal={setShowModal} contest={contest} user={loggedinUser} setSighting={setSighting} handleSightingAdd={handleSightingAdd} handleSubmit={handleSubmit} />
       )
     }
 
     const contestScores = () => {
-      // const results = contests.filter(contest => loggedinUser.contests.includes(contest.id))
+      // const results = contests.filter(contest => findingUser.contests.includes(contest.id))
       return (
         <div>
-          <UserScorePage contests={contests} handleShowModal={handleShowModal} setContest={setContest} />
+          <UserScorePage users={userContest} handleShowModal={handleShowModal} setContest={setContest}  />
         </div>
       )
     }
 
   const [contest, setContest] = useState(null)
 
-  
+
 
   return (
     <><div>
@@ -381,7 +394,6 @@ const App = () => {
 				<i>Pinnakisapalvelu, jossa käyttäjät voivat osallistua kilpailuihin ja lisätä lintuhavaintojaan.</i>
 			</div>
 			<div>
-				{/* <Link style={padding} to="/">Etusivu</Link> */}
 				<Link style={padding} to="/">Etusivu</Link>
 				<Link style={padding} to="/contests">Kilpailut</Link>
 				
@@ -390,30 +402,33 @@ const App = () => {
           <em>{loggedinUser.name} logged in</em></>
         ) : (
           <><Link style={padding} to="/registration">Rekisteröidy</Link>
-          <Link style={padding} to="/login">login</Link></>
+          <Link style={padding} to="/login">Kirjaudu</Link></>
         )}
 
 				{loggedinUser && <Link style={padding} to="/logout">LogOut</Link>}
         <Link style={padding} to="/contest-scores">Tulokset</Link>
+        {loggedinUser && loggedinUser.role === 0 && <Link style={padding} to="/add-contest">Lisää kilpailu</Link>}
 			</div>
 
 			<Routes>
 				<Route path="/" element={<Home />} />
 				<Route path="/contests" element={Contests()} />
+        <Route path="/contests/:id" element={contestScores()} />
         <Route path="/usercontest" element={loggedinUser && userContests()} />
 				<Route path="/registration" element={registerForm()} />
 				<Route path="/login" element={<><Login handleLogin={handleLogin} setLoginFormData={setLoginFormData} loginFormData={loginFormData} /><Notification message={notificationMessage} /></>} />
         <Route path="/logout" Component={handleLogOut}/>
         <Route path="/contest-scores" element={contestScores()}/>
+        <Route path="/add-contest" element={loggedinUser &&  loggedinUser.role === 0  && contestForm()}/>
 			</Routes>
 		</Router>
 
-    <Button name="65edc0fa4db8f95db486d907" type="button" className="btn btn-warning" onClick={(event) => handleFindUserContest(event)}>
+    {/* <Button name="65edc0fa4db8f95db486d907" type="button" className="btn btn-warning" onClick={(event) => handleFindUserContest(event)}>
             Poistu kisasta
-          </Button>
+          </Button> */}
 
       {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
-      {loggedinUser && contestForm()}
+      {/* {loggedinUser && contestForm()} */}
       {loggedinUser && birdSightModal()} 
 
     </div></>
@@ -421,4 +436,3 @@ const App = () => {
 }
 
 export default App
-

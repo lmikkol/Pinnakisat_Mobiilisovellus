@@ -2,10 +2,52 @@ const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const User = require('../models/user')
 const Contest = require('../models/contest')
+const { response } = require('express')
 
 
-// käsittelelee käyttäjätunnuksen luomista
-// hashaa salasanan
+usersRouter.put('/addsighting/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  const body = req.body
+  // const birds = body.sighting.birds
+
+  console.log(body)
+
+  const newSighting = {
+    contestId: body.contestId,
+    region: body.region,
+    distanceKM: body.kilometers,
+    hours: body.hours,
+    spontaneous: body.spontaneous,
+    sightings: body.sightings
+  }
+
+  // const newSighting = {
+    
+  //   contestId: body.contestId,
+  //   region: body.sighting.region,
+  //   distanceKM: body.sighting.kilometers,
+  //   hours: body.sighting.hours,
+  //   spontaneous: body.sighting.spontaneous,
+  //   birdList: birds
+  // }
+
+
+  console.log(newSighting, "NEWSIHT FROM PAK")
+
+    User.findByIdAndUpdate(userId, { $push: { sightings: { $each: [newSighting] } } }, { new: true })
+      .then(updatedUser => {
+        if (!updatedUser) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+        console.log(updatedUser, "UPDATED")
+        return res.json(updatedUser)
+      })
+      .catch(error => {
+        console.error('Error adding user sightings', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+      });
+
+})
 
 usersRouter.put('/joincontest/:contestId/:userId', async (req, res) => {
   const contestId = req.params.contestId;
@@ -43,7 +85,6 @@ usersRouter.put('/leavecontest/:contestId/:userId', async (req, res) => {
 
 })
 
-
 usersRouter.post('/', async (request, response) => {
   console.log(request.body.registerFormData)
   const { email, firstName, lastName, password } = request.body.registerFormData
@@ -69,7 +110,7 @@ usersRouter.post('/', async (request, response) => {
 })
 
 usersRouter.get('/', async (request, response) => {
-  const users = await User.find({}).populate('contests', { name: 1, description: 1 })
+  const users = await User.find({}).populate('contests', { name: 1, description: 1 }).populate('sightings')
   response.json(users)
 })
 
@@ -90,6 +131,20 @@ usersRouter.get('/findusers/:id', async (request, response) => {
     response.status(500).json({ message: 'Internal Server Error' });
   }
 })
+
+// usersRouter.get('/findusersightings/:id', async (request, response) => {
+//   const id = request.params.id
+//   console.log(id, "IDDDDD")
+
+//   try{
+//     const userSightings = await User.find({sightins: id}).populate('sightings', {region: 1})
+
+//     return response.status(200).json(userSightings);
+//   } catch (error) {
+//     console.error('Error searching sightings:', error)
+//     response.status(500).json({ message: 'Internal Server Error' })
+//   }
+// })
 
 module.exports = usersRouter
 

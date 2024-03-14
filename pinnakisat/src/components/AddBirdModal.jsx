@@ -2,7 +2,8 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useState, useEffect } from 'react'
 import CustomInput from './CustomInput'
-
+import userService from '../services/userService'
+import sightingService from '../services/sightings';
 import Select from 'react-select';
 
 import {
@@ -12,23 +13,18 @@ import {
 } from '../data/birds'
 
 
-
 function AddBirdModal({ showModal, setShowModal, contest, user, setSighting, handleSightingAdd }) {
   const handleCloseModal = () => setShowModal(false);
 
-
-
-
   const [selectedOption, setSelectedOption] = useState([]);
+
   const handler = (event) => {
     event.preventDefault()
     console.log(selectedOption, ' was selected')
     setSelectedOption(selectedOption)
   }
 
-
   const contestInit = {
-    userId: '',
     contestId: '',
     kilometers: '',
     spontaneous: '',
@@ -63,12 +59,13 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setSighting, han
 
   //EI NÄIN VAAN LUO UUSI TIETUE AIEMPIEN DATOJEN POHJALTA
   const handleSubmit = (event) => {
-    console.log(contest[0].id, "TEESTTT")
+
     event.preventDefault();
-    console.log(formData, "TESTIN")
-    console.log(selectedOption)
+
+
     let birdObject = { name: '', date: '' }
     let addingBirds = []
+
     selectedOption.map((bird, idx) => {
       birdObject.name = bird.fi
       birdObject.date = formData[idx]
@@ -76,8 +73,8 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setSighting, han
       birdObject = { name: '', date: '' }
     })
 
-    console.log(addingBirds)
-    const newObject = {
+
+    let newObject = {
       userId: user.id,
       contestId: contest,
       kilometers: contestFormData.kilometers,
@@ -86,10 +83,21 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setSighting, han
       hours: contestFormData.hours,
       birds: addingBirds
     }
-    setSighting(newObject)
-    handleSightingAdd(event)
+
+    console.log(newObject)
+
+
+    
+    sightingService.createSighting(newObject).then(returnedSighting => {
+    
+      console.log(returnedSighting, "UUSI PÄKISTÄ")
+               
+    })
+
+
+    setContestFormData(contestInit)
+    setFormData(Array(selectedOption.length).fill())
     addingBirds = []
-    console.log("NEW", newObject)
 
   };
 

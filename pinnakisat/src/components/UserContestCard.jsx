@@ -25,7 +25,7 @@ function UserContestCard({contest, handleShowModal, setContest, handleRemoveCont
         <Button name={contest.id} type="button" className="btn btn-primary mr-1" data-toggle="modal" data-target="#exampleModalScrollable" onClick={(event) => TEST(event = {event})} >
         Lisää uusi havainto
       </Button>
-      <Button name={contest.id} type="button" className="btn btn-warning" onClick={() => handleRemoveContestFromUser(event)}>
+      <Button name={contest.id} type="button" className="btn btn-warning" onClick={(event) => handleRemoveContestFromUser(event)}>
             Poistu kisasta
           </Button>
       </Card.Body>

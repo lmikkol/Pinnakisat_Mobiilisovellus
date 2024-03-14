@@ -15,12 +15,13 @@ const getSightings = () => {
     return request.then(response => response.data)
 }
 
-const createSighting = async newObject => {
+const createSighting = async (newObject) => {
     const config = {
       headers: { Authorization: token},
     }
 
-    const response = await axios.post(baseUrl, newObject, config)
+
+    const response = await axios.post(baseUrl, newObject)
     return response.data
   }
 
