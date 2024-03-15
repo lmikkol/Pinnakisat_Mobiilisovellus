@@ -32,10 +32,14 @@ sightingsRouter.post('/', async (request, response, next) => {
   //   });
 
   const savedSighting = await sighting.save()
-  user.sightings = user.sightings.concat(savedSighting._id)  
-  await user.save()
-  console.log(savedSighting)
-  response.json(savedSighting)
+  User.findByIdAndUpdate(body.userId, { $push: { sightings: savedSighting.id } }, { new: true }).populate('sightings').then(updatedUser => {
+  if (!updatedUser) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  response.json(updatedUser) 
+})
+ 
 })
 
 module.exports = sightingsRouter

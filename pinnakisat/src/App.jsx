@@ -36,10 +36,10 @@ const Home = () => {
   )
 }
 
-const addContest = () => {
+const CreateNewContest = () => {
   return(
     <div>
-      <Button>Lisää kilpailu</Button>
+      <ContestForm handleSubmit={handleSubmit} handleInputChange={handleInputChange} contestFormData={contestFormData}/>
     </div>
   )
 }
@@ -58,7 +58,7 @@ const Login = ({handleLogin, setLoginFormData, loginFormData}) => {
   
   return (
     <div>
-      <LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} />
+      <LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData}/>
     </div>
   )
 }
@@ -69,6 +69,7 @@ const App = () => {
     padding: 5
   }
 
+//#region STATE CREDENTIALS
   // form for objects, used by contestFormData
   // when submit button is pressed
   // resets the contest form to default
@@ -93,14 +94,10 @@ const App = () => {
     lastName: '',
     password: ''
   }
+//#endregion STATE CREDENTIALS END
 
-  const notificationInfo = {
-    type: '',
-    message: ''
-  }
-
+//#region STATES START
   // const [newContest, setNewContest] = useState('')
-  const [contests, setContests] = useState([])
   const [scores, setScores] = useState(null)
   const [contestFormData, setContestFormData] = useState(contestInit)
   const [loginFormData, setLoginFormData] = useState(loginCredentials)
@@ -108,14 +105,20 @@ const App = () => {
   const [loggedinUser, setUser] = useState(null)
   const [selectedOption, setSelectedOption] = useState([]);
   const [userContest, setUserContest] = useState([]);
-  const [notificationMessage, setNotification] = useState({notificationInfo})
+  const [notificationMessage, setNotification] = useState({})
   const [showModal, setShowModal] = useState(false);
   const [sightings, setSighting] = useState({})
 
 
+  //UUDET JA PIDETTÄVÄT
+  const [allUsers, setAllUsers] = useState([])
+  const [contests, setContests] = useState([])
+//#endregion STATES END
+
   const handleShowModal = () => setShowModal(true);
 
 
+  //USEEFFECTIT START
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedPinnakisaUser')
     if (loggedUserJSON !== null) {
@@ -130,8 +133,9 @@ const App = () => {
   useEffect(() => {
     contestService
       .getAll()
-      .then(initialContests => {
-        setContests(initialContests)
+      .then(allContests => {
+        setContests(allContests)
+       
       })
   }, [])
 
@@ -143,6 +147,21 @@ const App = () => {
     })
   }, [])
 
+  console.log(allUsers, "ENNEN EFEKTI'")
+
+  useEffect(() => {
+    userService
+    .getAllUsers()
+    .then(users => {
+      setAllUsers(users)
+      console.log(users, 'USEFEECT KAIKKI USERIT!')
+  })
+  }, [])
+
+  
+  console.log(allUsers, "JÄLKEEN EFEKTI'")
+
+
   // Handles the inputs change on content change  
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -152,47 +171,47 @@ const App = () => {
     }));
   };
 
+
+//#region KISAAN OSALLISTUMINEN JA POISTUMINEN START
   const handleRemoveContestFromUser = async (event) => {
-    //Update userObject in database -> remove refkey based on contest id === event.target.name
-    console.log("TODO", event.target.name)
+    const contestId = event.target.name
+
     try {
-      // Call a method to remove the contest from the user's contests
-     const updatedUser= await userService.removeContest(event.target.name, loggedinUser.id);
-  
-      // Update the user state to reflect the removal of the contest
-      setUser(prevUser => ({
-        ...prevUser,
-        contests: prevUser.contests.filter(id => id !== event.target.name)
-      }));
+     await userService.removeContest(contestId, loggedinUser.id);
+    setUser(prevUser => ({
+      ...prevUser,
+      contests: prevUser.contests.filter(id => id !== contestId)
+    }));
     } catch (error) {
+      //FEAT: LISÄÄ NOTIFICAATIOT
       console.error('Error removing contest from user:', error);
       console.log('An error occurred while removing contest from user');
     }
-
   }
+  const handleAddUserToContest = async (contestId) => {
+
+    try {
+      await userService.addContest(contestId, loggedinUser.id)
+
+      setUser(prevUser => ({
+        ...prevUser,
+        contests: [...prevUser.contests, contestId]
+      }))
+      console.log(userContest, 'USERIN CONTESTIIIIITTT')
+
+    } catch (error) {
+      //FEAT: LISÄÄ NOTIFICAATIOT
+      console.error('Error adding user to contest:', error);
+      console.log('An error occurred while adding user to contest');
+    }
+  };
+//#endregion KISAAN OSALLISTUMINEN JA POISTUMINEN END
+
 
   const handleSightingAdd = (event) => {
     event.preventDefault();
     console.log("ONNISTUI SAATANA", sightings)
   }
-  
-    // Handles submit buttons functionality
-  // creating a new bird sighting object on click
-  // const handleSightingAdd = (event) => {
-
-  //   console.log("ONNISTUI SAATANA", sightings)
-  //   userService.createUserSighting(loggedinUser.id, sightings).then(returnedSighting => {
-  //          console.log(returnedSighting)
-           
-  //   })
-  //   // sightingService
-  //   //    .createSighting(sightings)
-  //   //    .then(returnedSighting => {
-  //   //     console.log(returnedSighting)
-  //   //     setSighting({})
-  //   //    })
-  //   setSighting({})
-  // };
 
   // Handles submit buttons functionality
   // creating a new contest object on click
@@ -233,6 +252,7 @@ const App = () => {
     }
   }
 
+  //#region KIRJAUTUMISEN KÄSITTELY
   // Kirjautumisen käsittelijä
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -256,7 +276,7 @@ const App = () => {
         type: "success",
         message: "Logged In!"
       })
-      settingTimeOut()
+      settingMessageTimeOut()
     } catch (error) {
       console.log('Wrong credentials', error)
       setNotification({
@@ -264,15 +284,15 @@ const App = () => {
        message: `Wrong credentials`
       }
       )
-      settingTimeOut()
+      settingMessageTimeOut()
     }
     const navigate = useNavigate();
     navigate('/');
   }
 
-  const settingTimeOut = () => {
+  const settingMessageTimeOut = () => {
     setTimeout(() => {
-      setNotification(notificationInfo)
+      setNotification({})
     }, 3000)
   }
 
@@ -287,6 +307,7 @@ const App = () => {
     window.localStorage.removeItem('loggedPinnakisaUser')
     setUser(null)
   }
+//#endregion KIRJAUTUMISEN KÄSITTELIJÄ END
 
   // Handles the button clicks on so called NavForm
   // will be changed overtime
@@ -296,23 +317,6 @@ const App = () => {
     setSelectedOption(selectedOption)
   }
 
-  const handleAddUserContest = async (contestId) => {
-    console.log(loggedinUser.id, contestId)
-    try {
-      const updatedUser = await userService.addContest(contestId, loggedinUser.id)
-     // const updatedUserContests = [...userContest, contests.find(contest => contest.id === contestId)];
-     // console.log(updatedUserContests, "UPDATED LIST")
-     // setUserContest(updatedUserContests);
-      setUser(prevUser => ({
-        ...prevUser,
-        contests: [...prevUser.contests, contestId]
-      }))
-
-    } catch (error) {
-      console.error('Error adding user to contest:', error);
-      console.log('An error occurred while adding user to contest');
-    }
-  };
 
   const handleFindUserContest = async (event) => {
      const contestId = event.target.name
@@ -327,13 +331,7 @@ const App = () => {
     }
   }
 
-  // Palauttaa kirjautumisen lomakkeen
-  const loginForm = () => {
-    return (
-      <LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} />
-    )
-  }
-
+  //#region FORMIT!!!
   const contestForm = () => {
     return (
       <ContestForm handleSubmit={handleSubmit} handleInputChange={handleInputChange} contestFormData={contestFormData}/>
@@ -361,29 +359,37 @@ const App = () => {
 
   const Contests = () => {
     return(
-    <ContestsPage contests={contests} handleAddUserContest={handleAddUserContest} loggedinUser={loggedinUser} handleRemoveContestFromUser={handleRemoveContestFromUser}/> 
+    <ContestsPage contests={contests} handleAddUserToContest={handleAddUserToContest} loggedinUser={loggedinUser} handleRemoveContestFromUser={handleRemoveContestFromUser}/> 
     )
   }
 
     // FILTTERÖI VAIN KÄYTTÄJÄN KISAT
     const birdSightModal = () => {
       return (
-        <AddBirdModal showModal={showModal} setShowModal={setShowModal} contest={contest} user={loggedinUser} setSighting={setSighting} handleSightingAdd={handleSightingAdd} handleSubmit={handleSubmit} />
+        <AddBirdModal showModal={showModal}  setShowModal={setShowModal} contest={contest} user={loggedinUser} setAllUsers={setAllUsers} setSighting={setSighting} handleSightingAdd={handleSightingAdd} handleSubmit={handleSubmit} />
       )
     }
 
     const contestScores = () => {
       // const results = contests.filter(contest => findingUser.contests.includes(contest.id))
+      console.log("all users", allUsers)
       return (
         <div>
-          <UserScorePage users={userContest} handleShowModal={handleShowModal} setContest={setContest}  />
+          <UserScorePage users={allUsers} contests={contests} handleShowModal={handleShowModal} setContest={setContest}  />
         </div>
       )
     }
 
-  const [contest, setContest] = useState(null)
-
-
+    const NotificationMessages = () => {
+      return(
+        <div>
+          <Notification message={notificationMessage} />
+        </div>
+      )
+    }
+//#endregion FORMIT!!! END
+  
+const [contest, setContest] = useState(null)
 
   return (
     <><div>
@@ -406,20 +412,20 @@ const App = () => {
         )}
 
 				{loggedinUser && <Link style={padding} to="/logout">LogOut</Link>}
-        <Link style={padding} to="/contest-scores">Tulokset</Link>
-        {loggedinUser && loggedinUser.role === 0 && <Link style={padding} to="/add-contest">Lisää kilpailu</Link>}
+        {/* <Link style={padding} to="/contest-scores">Tulokset</Link> */}
+        {loggedinUser && loggedinUser.userRole===0 && <Link style={padding} to="/add-contest">Lisää kilpailu</Link>}
 			</div>
 
 			<Routes>
 				<Route path="/" element={<Home />} />
-				<Route path="/contests" element={Contests()} />
+				<Route path="/contests" element={Contests()}/>
         <Route path="/contests/:id" element={contestScores()} />
         <Route path="/usercontest" element={loggedinUser && userContests()} />
 				<Route path="/registration" element={registerForm()} />
-				<Route path="/login" element={<><Login handleLogin={handleLogin} setLoginFormData={setLoginFormData} loginFormData={loginFormData} /><Notification message={notificationMessage} /></>} />
+				<Route path="/login" element={<><Login handleLogin={handleLogin} setLoginFormData={setLoginFormData} loginFormData={loginFormData} /> {NotificationMessages()}</>}/>
         <Route path="/logout" Component={handleLogOut}/>
         <Route path="/contest-scores" element={contestScores()}/>
-        <Route path="/add-contest" element={loggedinUser &&  loggedinUser.role === 0  && contestForm()}/>
+        <Route path="/add-contest" element={loggedinUser && contestForm()}/>
 			</Routes>
 		</Router>
 

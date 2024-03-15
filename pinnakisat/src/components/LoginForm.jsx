@@ -25,7 +25,6 @@ const LoginForm = ({handleLogin, handleLoginInputChange, loginFormData }) => {
             inputTitle={"Salasana"}
           />
           <button type="submit">Kirjaudu</button>
-  
         </form>
         </div>
     )

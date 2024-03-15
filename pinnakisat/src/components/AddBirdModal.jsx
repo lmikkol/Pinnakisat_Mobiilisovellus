@@ -13,7 +13,7 @@ import {
 } from '../data/birds'
 
 
-function AddBirdModal({ showModal, setShowModal, contest, user, setSighting, handleSightingAdd }) {
+function AddBirdModal({ showModal, setShowModal, contest, user, setAllUsers, setSighting, handleSightingAdd }) {
   const handleCloseModal = () => setShowModal(false);
 
   const [selectedOption, setSelectedOption] = useState([]);
@@ -59,10 +59,6 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setSighting, han
 
   //EI NÄIN VAAN LUO UUSI TIETUE AIEMPIEN DATOJEN POHJALTA
   const handleSubmit = (event) => {
-
-    event.preventDefault();
-
-
     let birdObject = { name: '', date: '' }
     let addingBirds = []
 
@@ -72,7 +68,6 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setSighting, han
       addingBirds.push(birdObject)
       birdObject = { name: '', date: '' }
     })
-
 
     let newObject = {
       userId: user.id,
@@ -84,19 +79,32 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setSighting, han
       birds: addingBirds
     }
 
-    console.log(newObject)
-
-
+    sightingService.createSighting(newObject).then(returnedUser => {
+      event.preventDefault();
     
-    sightingService.createSighting(newObject).then(returnedSighting => {
+      console.log(returnedUser, "UUSI PÄKISTÄ")
+      setContestFormData(contestInit)
+      setFormData(Array(selectedOption.length).fill())
+      setAllUsers(prevUsers => {
+        console.log("Previous Users:", prevUsers);
     
-      console.log(returnedSighting, "UUSI PÄKISTÄ")
-               
+        // Find the index of the user in the previous state
+        const userIndex = prevUsers.findIndex(u => u.id === returnedUser.id);
+        console.log("User Index:", userIndex);
+    
+        if (userIndex !== -1) {
+          // If user found, create a new array with the updated user object
+          const updatedUsers = [...prevUsers];
+          updatedUsers[userIndex] = returnedUser;
+          console.log("Updated Users:", updatedUsers);
+          return updatedUsers;
+        }
+        // If user not found (unlikely), return the previous state as is
+        console.log("User not found. Returning previous state.");
+        return prevUsers;
+      });
     })
 
-
-    setContestFormData(contestInit)
-    setFormData(Array(selectedOption.length).fill())
     addingBirds = []
 
   };
@@ -148,7 +156,7 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setSighting, han
                               value={formData[index]}
                               name="kilometers"
                               type={'text'}
-                              placeholder={'kilometrit'}
+                              placeholder={'päivämäärä'}
                               inputTitle={selectedOption[index].label} />
                           </div>
                         ))}
