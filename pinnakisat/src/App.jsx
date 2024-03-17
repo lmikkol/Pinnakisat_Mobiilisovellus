@@ -68,6 +68,12 @@ const App = () => {
   const padding = {
     padding: 5
   }
+  
+  const alertTimer = () => {
+    setTimeout(() => {
+      setNotification({})
+    }, 3000)
+  }
 
 //#region STATE CREDENTIALS
   // form for objects, used by contestFormData
@@ -186,6 +192,11 @@ const App = () => {
       //FEAT: LISÄÄ NOTIFICAATIOT
       console.error('Error removing contest from user:', error);
       console.log('An error occurred while removing contest from user');
+      setNotification({
+        type: "warning",
+        message: "Virhe poistettaessa kisaa käyttäjältä"
+      })
+      alertTimer()
     }
   }
   const handleAddUserToContest = async (contestId) => {
@@ -198,11 +209,21 @@ const App = () => {
         contests: [...prevUser.contests, contestId]
       }))
       console.log(userContest, 'USERIN CONTESTIIIIITTT')
+      setNotification({
+        type: "success",
+        message: "Kisaan liitytty"
+      })
+      alertTimer()
 
     } catch (error) {
       //FEAT: LISÄÄ NOTIFICAATIOT
       console.error('Error adding user to contest:', error);
       console.log('An error occurred while adding user to contest');
+      setNotification({
+        type: "warning",
+        message: "Virhe kisaan liittymisessä"
+      })
+      alertTimer()
     }
   };
 //#endregion KISAAN OSALLISTUMINEN JA POISTUMINEN END
@@ -245,10 +266,20 @@ const App = () => {
 
       console.log("KÄYTTÄJÄ LUOTU", registeredUser)
       setRegisterFormData({})
+      setNotification({
+        type: "success",
+        message: "Käyttäjä rekisteröity!"
+      })
+      alertTimer()
       // setUser(registeredUser)
       // setLoginFormData(registerCredentials)
     } catch (exception) {
       console.log('Something went wrong..', exception)
+      setNotification({
+        type: "danger",
+        message: "Virhe rekisteröinnissä"
+      })
+      alertTimer()
     }
   }
 
@@ -274,26 +305,20 @@ const App = () => {
       setUserContest(results)
       setNotification({
         type: "success",
-        message: "Logged In!"
+        message: "Kirjauduttu sisään"
       })
-      settingMessageTimeOut()
+      alertTimer()
     } catch (error) {
       console.log('Wrong credentials', error)
       setNotification({
-       type: "warning",
-       message: `Wrong credentials`
+       type: "danger",
+       message: `Väärä sähköpostiosoite tai salasana`
       }
       )
-      settingMessageTimeOut()
+      alertTimer()
     }
     const navigate = useNavigate();
     navigate('/');
-  }
-
-  const settingMessageTimeOut = () => {
-    setTimeout(() => {
-      setNotification({})
-    }, 3000)
   }
 
   useEffect(() => {
@@ -306,6 +331,7 @@ const App = () => {
   const handleLogOut = () => {
     window.localStorage.removeItem('loggedPinnakisaUser')
     setUser(null)
+    
   }
 //#endregion KIRJAUTUMISEN KÄSITTELIJÄ END
 
