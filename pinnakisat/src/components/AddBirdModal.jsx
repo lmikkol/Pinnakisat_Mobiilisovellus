@@ -2,7 +2,6 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useState, useEffect } from 'react'
 import CustomInput from './CustomInput'
-import userService from '../services/userService'
 import sightingService from '../services/sightings';
 import Select from 'react-select';
 
@@ -13,16 +12,8 @@ import {
 } from '../data/birds'
 
 
-function AddBirdModal({ showModal, setShowModal, contest, user, setAllUsers, setSighting, handleSightingAdd }) {
-  const handleCloseModal = () => setShowModal(false);
+function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllUsers, setSighting, handleSightingAdd }) {
 
-  const [selectedOption, setSelectedOption] = useState([]);
-
-  const handler = (event) => {
-    event.preventDefault()
-    console.log(selectedOption, ' was selected')
-    setSelectedOption(selectedOption)
-  }
 
   const contestInit = {
     contestId: '',
@@ -32,16 +23,35 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setAllUsers, set
     hours: '',
     birds: []
   }
-
+  const [selectedOption, setSelectedOption] = useState([]);
+  console.log(selectedOption)
 
   const [contestFormData, setContestFormData] = useState(contestInit)
   const [formData, setFormData] = useState(Array(selectedOption.length).fill());
 
-  useEffect(() => {
-    // Handle form submission here, using contestFormData state
-    console.log(contestFormData);
-  }, [contestFormData]);
+  const handleCloseModal = () => {
+    setShowModal(false)
+    setSelectedOption([])
+  }
 
+  
+  useEffect(() => {
+    // Initialize form data if user has sightings for the contest
+    if (user.sightings.some(sighting => sighting.contest === contest)) {
+   
+       const userSightings = user.sightings.filter(sighting => sighting.contest === contest)[0];
+       setContestFormData({
+         contestId: contest,
+         kilometers: userSightings.distanceKM,
+         spontaneous: userSightings.spontaneous,
+         region: userSightings.region,
+         hours: userSightings.hours,
+         birds: userSightings.birdList
+       });
+       
+
+  }
+}, [contest, user])
 
   const handleSelectChange = (index, event) => {
     const newFormData = [...formData];
@@ -56,6 +66,7 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setAllUsers, set
       [name]: value,
     }));
   };
+    //console.log("user ennen",user)
 
   //EI NÄIN VAAN LUO UUSI TIETUE AIEMPIEN DATOJEN POHJALTA
   const handleSubmit = (event) => {
@@ -80,27 +91,53 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setAllUsers, set
     }
 
     sightingService.createSighting(newObject).then(returnedUser => {
-      event.preventDefault();
-    
-      console.log(returnedUser, "UUSI PÄKISTÄ")
+
+      const contestExists = user.sightings.some(sighting => sighting.contest === newObject.contestId);
+      ////console.log(user, newObject.contestId)
+
+      if (!contestExists) {
+        //console.log("EI OLE OLEMASSA",returnedUser )
+          user.sightings.push({
+            contest: newObject.contestId,
+            distanceKM: newObject.kilometers,
+            spontaneous: newObject.spontaneous,
+            region: newObject.region,
+            hours: newObject.hours,
+            birdList: newObject.birds
+           });
+      } else {
+        //console.log("ON OLEMASSA", returnedUser)
+          user.sightings = returnedUser.sightings.map(sighting => {
+            if (sighting.contest === contestFormData.contestId) {
+              let updatedSighting = returnedUser.sightings.filter(sighting => sighting.contest === newObject.contestId)[0]
+              //console.log(updatedSighting, "UPDATED SIGHTING")
+              return {
+                contest: updatedSighting.contest,
+                distanceKM: updatedSighting.distanceKM,
+                spontaneous: updatedSighting.spontaneous,
+                region: updatedSighting.region,
+                hours: updatedSighting.hours,
+                birdList: updatedSighting.birdList  
+              };
+            }
+            return sighting;
+          })
+
+          setUser(user)
+         
+        }
+      
+        setSelectedOption([])
+
       setContestFormData(contestInit)
       setFormData(Array(selectedOption.length).fill())
       setAllUsers(prevUsers => {
-        console.log("Previous Users:", prevUsers);
-    
-        // Find the index of the user in the previous state
         const userIndex = prevUsers.findIndex(u => u.id === returnedUser.id);
-        console.log("User Index:", userIndex);
-    
         if (userIndex !== -1) {
-          // If user found, create a new array with the updated user object
           const updatedUsers = [...prevUsers];
           updatedUsers[userIndex] = returnedUser;
-          console.log("Updated Users:", updatedUsers);
           return updatedUsers;
         }
-        // If user not found (unlikely), return the previous state as is
-        console.log("User not found. Returning previous state.");
         return prevUsers;
       });
     })
@@ -153,14 +190,17 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setAllUsers, set
                           <div key={index}>
                             <CustomInput
                               onChange={(event) => handleSelectChange(index, event)}
-                              value={formData[index]}
+                              value={formData[index] ? formData[index] : ''}
                               name="kilometers"
                               type={'text'}
                               placeholder={'päivämäärä'}
                               inputTitle={selectedOption[index].label} />
                           </div>
+                        
                         ))}
                       </div>
+                      <br/>
+
                       </div>
 
                       <div className="form-group">

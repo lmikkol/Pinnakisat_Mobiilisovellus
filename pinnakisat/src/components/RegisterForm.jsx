@@ -1,15 +1,15 @@
 import CustomInput from "./CustomInput"
-
-
+import Stack from 'react-bootstrap/Stack';
 
 /// JATKA TÄSTÄ
 
-const RegisterForm = ({ handleRegistration, handleRegisterInputChange, registerFormData }) => {
+const RegisterForm = ({ handleRegistration, handleRegisterInputChange, registerFormData}) => {
 
   return (
     <div>
+      <Stack gap={1}>
       <h2>Rekisteröi käyttäjä</h2>
-      <form onSubmit={handleRegistration}>
+      <form className="p-2" onSubmit={handleRegistration} noValidate>
         <CustomInput
           onChange={handleRegisterInputChange}
           value={registerFormData.email}
@@ -17,6 +17,8 @@ const RegisterForm = ({ handleRegistration, handleRegisterInputChange, registerF
           type={'text'}
           placeholder={'Sähköposti'}
           inputTitle={"Sähköposti"}
+          isRequired={true}
+
         />
 
         <CustomInput
@@ -26,6 +28,8 @@ const RegisterForm = ({ handleRegistration, handleRegisterInputChange, registerF
           type={'text'}
           placeholder={'Etunimi'}
           inputTitle={"Etunimi"}
+          isRequired={true}
+
         />
 
         <CustomInput
@@ -35,6 +39,8 @@ const RegisterForm = ({ handleRegistration, handleRegisterInputChange, registerF
           type={'text'}
           placeholder={'Sukunimi'}
           inputTitle={"Sukunimi"}
+          isRequired={true}
+
         />
 
         <CustomInput
@@ -44,12 +50,24 @@ const RegisterForm = ({ handleRegistration, handleRegisterInputChange, registerF
           type={'password'}
           placeholder={'Salasana'}
           inputTitle={"Salasana"}
+          isRequired={true}
+
         />
 
+        <CustomInput
+        onChange={handleRegisterInputChange}
+          value={registerFormData.passwordAgain}
+          name="passwordAgain"
+          type={'password'}
+          placeholder={'Vahvista salasana'}
+          inputTitle={"Vahvista salasana"}
+          isRequired={true}
 
+        />
         <button type="submit">Rekisteröidy</button>
 
       </form>
+      </Stack>
     </div>
   )
 }

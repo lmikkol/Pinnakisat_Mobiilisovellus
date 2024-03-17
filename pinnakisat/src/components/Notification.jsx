@@ -1,9 +1,8 @@
-
 import { Alert } from 'react-bootstrap'
 
 
 const Notification = ({ message }) => {
-  if (message === null) {
+  if (!message.message) {
     return null
   }
 

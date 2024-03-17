@@ -36,7 +36,13 @@ const UserScorePage = ({ users, contests }) => {
   }
 
   participatedUsers.sort((a, b) => calculatePoints(b.sightings) - calculatePoints(a.sightings));
+  
 
+  if (participatedUsers.length === 0) {
+
+    return ( 
+      <><h2>{contestName}</h2><p>No users have participated in this contest.</p></> )
+  }
 
   return (
     <>

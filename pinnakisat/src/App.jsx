@@ -15,7 +15,6 @@ import ContestsPage from './components/ContestsPage'
 import UserContestsPage from './components/UserContestsPage'
 import UserScorePage from './components/UserScorePage'
 import Button from 'react-bootstrap/Button'
-
 import {
   BrowserRouter as Router,
   Routes, 
@@ -25,7 +24,6 @@ import {
   useParams,
   useNavigate,
 } from 'react-router-dom'
-import login from './services/login'
 
 const Home = () => {
 
@@ -63,12 +61,14 @@ const Login = ({handleLogin, setLoginFormData, loginFormData}) => {
   )
 }
 
+
 const App = () => {
   
+  const navigate = useNavigate()
   const padding = {
     padding: 5
   }
-  
+
   const alertTimer = () => {
     setTimeout(() => {
       setNotification({})
@@ -98,10 +98,10 @@ const App = () => {
     email: '',
     firstName: '',
     lastName: '',
-    password: ''
+    password: '',
+    passwordAgain: ''
   }
 //#endregion STATE CREDENTIALS END
-
 //#region STATES START
   // const [newContest, setNewContest] = useState('')
   const [scores, setScores] = useState(null)
@@ -109,7 +109,6 @@ const App = () => {
   const [loginFormData, setLoginFormData] = useState(loginCredentials)
   const [registerFormData, setRegisterFormData] = useState(registerCredentials)
   const [loggedinUser, setUser] = useState(null)
-  const [selectedOption, setSelectedOption] = useState([]);
   const [userContest, setUserContest] = useState([]);
   const [notificationMessage, setNotification] = useState({})
   const [showModal, setShowModal] = useState(false);
@@ -119,12 +118,13 @@ const App = () => {
   //UUDET JA PIDETTÄVÄT
   const [allUsers, setAllUsers] = useState([])
   const [contests, setContests] = useState([])
+  const [validated, setValidated] = useState(false);
 //#endregion STATES END
 
   const handleShowModal = () => setShowModal(true);
 
 
-  //USEEFFECTIT START
+//#region USEEFFECTIT START
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedPinnakisaUser')
     if (loggedUserJSON !== null) {
@@ -166,29 +166,34 @@ const App = () => {
 
   
   console.log(allUsers, "JÄLKEEN EFEKTI'")
+//#endregion 
 
 
-  // Handles the inputs change on content change  
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setContestFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-  };
+    // Handles the inputs change on content change  
+    const handleInputChange = (event) => {
+      const { name, value } = event.target;
+      setContestFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    };
+  
+  
 
 
 //#region KISAAN OSALLISTUMINEN JA POISTUMINEN START
-  const handleRemoveContestFromUser = async (event) => {
-    const contestId = event.target.name
+ //#region KISAAN OSALLISTUMINEN JA POISTUMINEN START
+ const handleRemoveContestFromUser = async (event) => {
+  const contestId = event.target.name
 
-    try {
-     await userService.removeContest(contestId, loggedinUser.id);
-    setUser(prevUser => ({
-      ...prevUser,
-      contests: prevUser.contests.filter(id => id !== contestId)
-    }));
-    } catch (error) {
+  try {
+   await userService.removeContest(contestId, loggedinUser.id);
+  setUser(prevUser => ({
+    ...prevUser,
+    contests: prevUser.contests.filter(id => id !== contestId)
+  }));
+  } catch (error) {
+
       //FEAT: LISÄÄ NOTIFICAATIOT
       console.error('Error removing contest from user:', error);
       console.log('An error occurred while removing contest from user');
@@ -199,6 +204,9 @@ const App = () => {
       alertTimer()
     }
   }
+
+
+
   const handleAddUserToContest = async (contestId) => {
 
     try {
@@ -226,6 +234,9 @@ const App = () => {
       alertTimer()
     }
   };
+
+
+  
 //#endregion KISAAN OSALLISTUMINEN JA POISTUMINEN END
 
 
@@ -247,6 +258,7 @@ const App = () => {
       })
   };
 
+
   // lisätty uutena testailua varten...
   const handleRegisterInputChange = (event) => {
     const { name, value } = event.target;
@@ -256,39 +268,74 @@ const App = () => {
     }));
   }
 
+
   // Käyttäjän luomisen käsittelijä
   const handleRegistration = async (event) => {
+    event.preventDefault()
     
+    
+
+    if (!registerFormData.password || registerFormData.password.length < 5 || !/\d/.test(registerFormData.password)) {
+      setNotification({
+        type: "danger",
+        message: "Salasanan on oltava vähintään 5 merkkiä pitkä ja sisältää 1 numero"
+      });
+      alertTimer();
+      return; // Prevent further execution
+    }
+
+    if(registerFormData.password !== registerFormData.passwordAgain) {
+      setNotification({
+        type: "danger",
+        message: "Salasanat eivät täsmää. Yritä uudelleen."
+      })
+      alertTimer()
+      return;
+    }
+    const form = event.currentTarget;
+    if(form.checkValidity() === false){
+      event.stopPropagation()
+    } else {
     try {
       const registeredUser = await userService.createUser({
         registerFormData
       })
 
       console.log("KÄYTTÄJÄ LUOTU", registeredUser)
-      setRegisterFormData({})
+      setRegisterFormData(registerCredentials)
+      
       setNotification({
         type: "success",
-        message: "Käyttäjä rekisteröity!"
+        message: "Käyttäjän rekisteröityminen onnistui!"
       })
       alertTimer()
+      navigate('/', {replace: true})
       // setUser(registeredUser)
       // setLoginFormData(registerCredentials)
-    } catch (exception) {
-      console.log('Something went wrong..', exception)
+    } catch (error) {
+      console.log('Wrong credentials', error)
       setNotification({
-        type: "danger",
-        message: "Virhe rekisteröinnissä"
-      })
-      alertTimer()
-    }
+        type: "warning",
+        message: `Käyttäjätietojen kirjaamisessa tapahtui ongelma, yritä uudelleen.`
+       }
+       )
+       alertTimer()
+    } 
   }
+}
+
 
   //#region KIRJAUTUMISEN KÄSITTELY
   // Kirjautumisen käsittelijä
-  const handleLogin = async (event) => {
-    event.preventDefault()
-    
-   
+  const handleLogin = async (event) => {  
+
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+      event.stopPropagation();
+    } else {
+  
     try {
       const loggedUser = await loginService.login({
         loginFormData
@@ -305,21 +352,24 @@ const App = () => {
       setUserContest(results)
       setNotification({
         type: "success",
-        message: "Kirjauduttu sisään"
+        message: "Logged In!"
       })
       alertTimer()
     } catch (error) {
       console.log('Wrong credentials', error)
       setNotification({
-       type: "danger",
-       message: `Väärä sähköpostiosoite tai salasana`
+       type: "warning",
+       message: `Wrong credentials`
       }
       )
       alertTimer()
     }
-    const navigate = useNavigate();
-    navigate('/');
   }
+  }
+
+
+
+
 
   useEffect(() => {
     if(loggedinUser || loggedinUser !== null){
@@ -335,27 +385,8 @@ const App = () => {
   }
 //#endregion KIRJAUTUMISEN KÄSITTELIJÄ END
 
-  // Handles the button clicks on so called NavForm
-  // will be changed overtime
-  const handler = (event) => {
-    event.preventDefault()
-    console.log(selectedOption, ' was selected')
-    setSelectedOption(selectedOption)
-  }
 
 
-  const handleFindUserContest = async (event) => {
-     const contestId = event.target.name
-     
-    try{
-      const findingUser = await userService.getUserContest(contestId)
-      console.log('löytyi:', findingUser)
-
-    } catch (error) {
-      console.error('Error finding user contest', error)
-      console.log('Error occured while searching for user contest')
-    }
-  }
 
   //#region FORMIT!!!
   const contestForm = () => {
@@ -367,7 +398,7 @@ const App = () => {
   const registerForm = () => {
     return (
       <div>
-        <RegisterForm handleRegistration={handleRegistration} handleRegisterInputChange={handleRegisterInputChange} registerFormData={registerFormData} />
+        <RegisterForm handleRegistration={handleRegistration} handleRegisterInputChange={handleRegisterInputChange} registerFormData={registerFormData}/>
       </div>
     )
   }
@@ -385,14 +416,14 @@ const App = () => {
 
   const Contests = () => {
     return(
-    <ContestsPage contests={contests} handleAddUserToContest={handleAddUserToContest} loggedinUser={loggedinUser} handleRemoveContestFromUser={handleRemoveContestFromUser}/> 
+    <ContestsPage contests={contests} handleAddUserToContest={handleAddUserToContest} loggedinUser={loggedinUser} handleRemoveContestFromUser={handleRemoveContestFromUser} handleSubmit={handleSubmit} handleInputChange={handleInputChange}  contestFormData={contestFormData} /> 
     )
   }
 
     // FILTTERÖI VAIN KÄYTTÄJÄN KISAT
     const birdSightModal = () => {
       return (
-        <AddBirdModal showModal={showModal}  setShowModal={setShowModal} contest={contest} user={loggedinUser} setAllUsers={setAllUsers} setSighting={setSighting} handleSightingAdd={handleSightingAdd} handleSubmit={handleSubmit} />
+        <AddBirdModal showModal={showModal}  setShowModal={setShowModal} contest={contest} user={loggedinUser} setUser={setUser} setAllUsers={setAllUsers} setSighting={setSighting} handleSightingAdd={handleSightingAdd} handleSubmit={handleSubmit} />
       )
     }
 
@@ -414,6 +445,7 @@ const App = () => {
       )
     }
 //#endregion FORMIT!!! END
+
   
 const [contest, setContest] = useState(null)
 
@@ -421,7 +453,7 @@ const [contest, setContest] = useState(null)
     <><div>
 
       <Header header={"Pinnakisapalvelu"} />
-      <Router>
+      {NotificationMessages()}
 			<div>
 				<i>Pinnakisapalvelu, jossa käyttäjät voivat osallistua kilpailuihin ja lisätä lintuhavaintojaan.</i>
 			</div>
@@ -447,13 +479,12 @@ const [contest, setContest] = useState(null)
 				<Route path="/contests" element={Contests()}/>
         <Route path="/contests/:id" element={contestScores()} />
         <Route path="/usercontest" element={loggedinUser && userContests()} />
-				<Route path="/registration" element={registerForm()} />
-				<Route path="/login" element={<><Login handleLogin={handleLogin} setLoginFormData={setLoginFormData} loginFormData={loginFormData} /> {NotificationMessages()}</>}/>
+				<Route path="/registration" element={registerForm()}/>
+				<Route path="/login" element={loggedinUser ? <Home/> : <Login handleLogin={handleLogin} setLoginFormData={setLoginFormData} loginFormData={loginFormData} />}/>
         <Route path="/logout" Component={handleLogOut}/>
         <Route path="/contest-scores" element={contestScores()}/>
         <Route path="/add-contest" element={loggedinUser && contestForm()}/>
 			</Routes>
-		</Router>
 
     {/* <Button name="65edc0fa4db8f95db486d907" type="button" className="btn btn-warning" onClick={(event) => handleFindUserContest(event)}>
             Poistu kisasta
@@ -466,5 +497,6 @@ const [contest, setContest] = useState(null)
     </div></>
   )
 }
+
 
 export default App

@@ -10,7 +10,6 @@ const findingSchema = new mongoose.Schema({
     
     region: {
         type: String,
-        required: true
     },
     distanceKM: {
         type: String

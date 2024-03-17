@@ -9,7 +9,7 @@ loginRouter.post('/', async (request, response) => {
 
   const {email, password} = request.body.loginFormData
 
-  const user = await User.findOne({ email })
+  const user = await User.findOne({ email }).populate('sightings')
   const passwordCorrect = user === null
     ? false
     : await bcrypt.compare(password, user.passwordHash)
@@ -34,7 +34,7 @@ loginRouter.post('/', async (request, response) => {
     console.log("TOKEENN", token)
   response
     .status(200)
-    .send({ token, name: user.email, userRole: user.role, id: user._id, contests: user.contests})
+    .send({ token, name: user.email, userRole: user.role, id: user._id, contests: user.contests, sightings:user.sightings})
 })
 
 module.exports = loginRouter

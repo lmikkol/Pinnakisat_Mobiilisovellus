@@ -1,66 +1,90 @@
-import CustomInput from "./CustomInput"
+import { useState } from 'react';
+import { Modal, Button } from 'react-bootstrap';
+import CustomInput from './CustomInput';
 
-const ContestForm = ({handleSubmit, handleInputChange, contestFormData }) => {
- 
-  return(
-  <form onSubmit={handleSubmit}>
-        <CustomInput
-          onChange={handleInputChange}
-          value={contestFormData.name}
-          name="name"
-          type={'text'}
-          placeholder={'Kilpailun nimi'}
-          inputTitle = {"Nimi"}
-        />
+const ContestFormModal = ({ handleSubmit, handleInputChange, contestFormData }) => {
+  const [showModal, setShowModal] = useState(false);
 
-        <CustomInput
-          onChange={handleInputChange}
-          value={contestFormData.description}
-          name="description"
-          type={'text'}
-          placeholder={'Kilpailun tiedot'}
-          inputTitle={"Lisätiedot"}
-        />
+  const handleModalClose = () => setShowModal(false);
+  const handleModalShow = () => setShowModal(true);
 
-        <CustomInput
-          onChange={handleInputChange}
-          value={contestFormData.date_begin}
-          name="date_begin"
-          type={'date'}
-          placeholder={'Kilpailun aloituspäivämäärä'}
-          inputTitle={"Aloituspäivämäärä"}
-        />
+  return (
+    <>
+      <Button variant="primary" onClick={handleModalShow}>
+        Lisää kilpailu
+      </Button>
 
-        <CustomInput
-          onChange={handleInputChange}
-          value={contestFormData.date_end}
-          name="date_end"
-          type={'date'}
-          placeholder={'Kilpailun päättymispäivämäärä'}
-          inputTitle={"Päättymispäivämäärä"}
-        />
+      <Modal show={showModal} onHide={handleModalClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Contest Form</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <form onSubmit={handleSubmit}>
+            <CustomInput
+              onChange={handleInputChange}
+              value={contestFormData ? contestFormData.name : ''}
+              name="name"
+              type={'text'}
+              placeholder={'Kilpailun nimi'}
+              inputTitle={"Nimi"}
+            />
 
-        <CustomInput
-          onChange={handleInputChange}
-          value={contestFormData.url}
-          name="url"
-          type={'text'}
-          placeholder={'Kilpailun URL'}
-          inputTitle={"URL"}
-        />
+            <CustomInput
+              onChange={handleInputChange}
+              value={contestFormData ? contestFormData.description : ''}
+              name="description"
+              type={'text'}
+              placeholder={'Kilpailun tiedot'}
+              inputTitle={"Lisätiedot"}
+            />
 
-        <CustomInput
-          onChange={handleInputChange}
-          value={contestFormData.status}
-          name="status"
-          type={'text'}
-          placeholder={'Kilpailun tila'}
-          inputTitle={"Tila"}
-        />
+            <CustomInput
+              onChange={handleInputChange}
+              value={contestFormData ? contestFormData.date_begin : ''}
+              name="date_begin"
+              type={'date'}
+              placeholder={'Kilpailun aloituspäivämäärä'}
+              inputTitle={"Aloituspäivämäärä"}
+            />
 
-        <button type="submit">Tallenna</button>
+            <CustomInput
+              onChange={handleInputChange}
+              value={contestFormData ? contestFormData.date_end : ''}
+              name="date_end"
+              type={'date'}
+              placeholder={'Kilpailun päättymispäivämäärä'}
+              inputTitle={"Päättymispäivämäärä"}
+            />
 
-      </form>
-  )
+            <CustomInput
+              onChange={handleInputChange}
+              value={contestFormData ? contestFormData.url : ''}
+              name="url"
+              type={'text'}
+              placeholder={'Kilpailun URL'}
+              inputTitle={"URL"}
+            />
+
+            <CustomInput
+              onChange={handleInputChange}
+              value={contestFormData ? contestFormData.status : '' }
+              name="status"
+              type={'text'}
+              placeholder={'Kilpailun tila'}
+              inputTitle={"Tila"}
+            />
+
+            <Button variant="secondary" onClick={handleModalClose}>
+              Close
+            </Button>
+            <Button variant="primary" type="submit">
+              Save Changes
+            </Button>
+          </form>
+        </Modal.Body>
+      </Modal>
+    </>
+  );
 }
-  export default ContestForm
+
+export default ContestFormModal;

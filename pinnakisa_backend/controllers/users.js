@@ -21,16 +21,6 @@ usersRouter.put('/addsighting/:userId', async (req, res) => {
     sightings: body.sightings
   }
 
-  // const newSighting = {
-    
-  //   contestId: body.contestId,
-  //   region: body.sighting.region,
-  //   distanceKM: body.sighting.kilometers,
-  //   hours: body.sighting.hours,
-  //   spontaneous: body.sighting.spontaneous,
-  //   birdList: birds
-  // }
-
 
   console.log(newSighting, "NEWSIHT FROM PAK")
 
@@ -93,6 +83,10 @@ usersRouter.post('/', async (request, response) => {
 
   //   }
 
+  if (!isValidPassword(password)) {
+    return response.status(400).json({ error: 'Invalid password. Password must contain at least 4 letters and 1 digit' });
+  }
+
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
   //    const role = 0
@@ -108,6 +102,11 @@ usersRouter.post('/', async (request, response) => {
 
   response.status(201).json(savedUser)
 })
+
+function isValidPassword(password) {
+  // Password must contain at least 4 letters, 1 digit, and 1 special character
+  return /^(?=.*[A-Za-z]{4,})(?=.*\d).{6,}$/.test(password);
+}
 
 usersRouter.get('/', async (request, response) => {
   const users = await User.find({}).populate('contests', { name: 1, description: 1 }).populate('sightings')
@@ -132,19 +131,6 @@ usersRouter.get('/findusers/:id', async (request, response) => {
   }
 })
 
-// usersRouter.get('/findusersightings/:id', async (request, response) => {
-//   const id = request.params.id
-//   console.log(id, "IDDDDD")
-
-//   try{
-//     const userSightings = await User.find({sightins: id}).populate('sightings', {region: 1})
-
-//     return response.status(200).json(userSightings);
-//   } catch (error) {
-//     console.error('Error searching sightings:', error)
-//     response.status(500).json({ message: 'Internal Server Error' })
-//   }
-// })
 
 module.exports = usersRouter
 
