@@ -75,10 +75,10 @@ const ContestFormModal = ({ handleSubmit, handleInputChange, contestFormData }) 
             />
 
             <Button variant="secondary" onClick={handleModalClose}>
-              Close
+              Poistu
             </Button>
             <Button variant="primary" type="submit">
-              Save Changes
+              Tallenna muutokset
             </Button>
           </form>
         </Modal.Body>

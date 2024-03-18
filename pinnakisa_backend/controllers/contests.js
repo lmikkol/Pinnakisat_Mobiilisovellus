@@ -57,6 +57,8 @@ contestRouter.post('/', (request, response, next) => {
 		status: body.status
 	})
 
+	console.log(body.status, "STATUS BÄKISTÄ!")
+
 	// tallentaa luodun olion tietokantaan
 	contest.save().then(savedContest => {
 		response.json(savedContest)

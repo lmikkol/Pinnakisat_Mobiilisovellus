@@ -15,6 +15,7 @@ import {
 function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllUsers, setSighting, handleSightingAdd }) {
 
 
+  console.log(groupedOptions)
   const contestInit = {
     contestId: '',
     kilometers: '',
@@ -23,40 +24,55 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
     hours: '',
     birds: []
   }
-  const [selectedOption, setSelectedOption] = useState([]);
-  console.log(selectedOption)
+  const [selectedBird, setSelectedBird] = useState([]);
+  console.log(selectedBird)
 
   const [contestFormData, setContestFormData] = useState(contestInit)
-  const [formData, setFormData] = useState(Array(selectedOption.length).fill());
+  const [birdsDate, setBirdsDate] = useState(Array(selectedBird.length).fill());
 
   const handleCloseModal = () => {
     setShowModal(false)
-    setSelectedOption([])
+    setContestFormData(contestInit);
+    setBirdsDate(Array(selectedBird.length).fill())
+    setSelectedBird([]);
   }
 
-  
+  console.log(user.sightings)
+
+
   useEffect(() => {
-    // Initialize form data if user has sightings for the contest
-    if (user.sightings.some(sighting => sighting.contest === contest)) {
-   
-       const userSightings = user.sightings.filter(sighting => sighting.contest === contest)[0];
-       setContestFormData({
-         contestId: contest,
-         kilometers: userSightings.distanceKM,
-         spontaneous: userSightings.spontaneous,
-         region: userSightings.region,
-         hours: userSightings.hours,
-         birds: userSightings.birdList
-       });
-       
+    if (user.sightings.length > 0) {
+      const userSighting = user.sightings.find(sighting => sighting.contest === contest);
+      if (userSighting) {
+        setBirdsDate(userSighting.birdList.map(bird => bird.date));
+        setSelectedBird(groupedOptions.reduce((acc, curr) => {
+          curr.options.forEach(option => {
+            if (userSighting.birdList.some(bird => bird.name === option.label)) {
+              acc.push(option);
+            }
+          });
+          return acc;
+        }, []));
+        setContestFormData({
+          contestId: contest,
+          kilometers: userSighting.distanceKM,
+          spontaneous: userSighting.spontaneous,
+          region: userSighting.region,
+          hours: userSighting.hours,
+          birds: userSighting.birdList
+        });
+      } else {
+        setSelectedBird([]);
+        setContestFormData(contestInit);
+      }
+    }
+  }, [user.sightings, contest]);
 
-  }
-}, [contest, user])
 
   const handleSelectChange = (index, event) => {
-    const newFormData = [...formData];
-    newFormData[index] = event.target.value;
-    setFormData(newFormData);
+    const newbirdsDate = [...birdsDate];
+    newbirdsDate[index] = event.target.value;
+    setBirdsDate(newbirdsDate);
   };
 
   const handleSecInputChange = (event) => {
@@ -66,16 +82,16 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
       [name]: value,
     }));
   };
-    //console.log("user ennen",user)
+  //console.log("user ennen",user)
 
   //EI NÄIN VAAN LUO UUSI TIETUE AIEMPIEN DATOJEN POHJALTA
   const handleSubmit = (event) => {
     let birdObject = { name: '', date: '' }
     let addingBirds = []
 
-    selectedOption.map((bird, idx) => {
+    selectedBird.map((bird, idx) => {
       birdObject.name = bird.fi
-      birdObject.date = formData[idx]
+      birdObject.date = birdsDate[idx]
       addingBirds.push(birdObject)
       birdObject = { name: '', date: '' }
     })
@@ -97,40 +113,39 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
 
       if (!contestExists) {
         //console.log("EI OLE OLEMASSA",returnedUser )
-          user.sightings.push({
-            contest: newObject.contestId,
-            distanceKM: newObject.kilometers,
-            spontaneous: newObject.spontaneous,
-            region: newObject.region,
-            hours: newObject.hours,
-            birdList: newObject.birds
-           });
+        user.sightings.push({
+          contest: newObject.contestId,
+          distanceKM: newObject.kilometers,
+          spontaneous: newObject.spontaneous,
+          region: newObject.region,
+          hours: newObject.hours,
+          birdList: newObject.birds
+        });
       } else {
         //console.log("ON OLEMASSA", returnedUser)
-          user.sightings = returnedUser.sightings.map(sighting => {
-            if (sighting.contest === contestFormData.contestId) {
-              let updatedSighting = returnedUser.sightings.filter(sighting => sighting.contest === newObject.contestId)[0]
-              //console.log(updatedSighting, "UPDATED SIGHTING")
-              return {
-                contest: updatedSighting.contest,
-                distanceKM: updatedSighting.distanceKM,
-                spontaneous: updatedSighting.spontaneous,
-                region: updatedSighting.region,
-                hours: updatedSighting.hours,
-                birdList: updatedSighting.birdList  
-              };
-            }
-            return sighting;
-          })
+        user.sightings = returnedUser.sightings.map(sighting => {
+          if (sighting.contest === contestFormData.contestId) {
+            let updatedSighting = returnedUser.sightings.filter(sighting => sighting.contest === newObject.contestId)[0]
+            //console.log(updatedSighting, "UPDATED SIGHTING")
+            return {
+              contest: updatedSighting.contest,
+              distanceKM: updatedSighting.distanceKM,
+              spontaneous: updatedSighting.spontaneous,
+              region: updatedSighting.region,
+              hours: updatedSighting.hours,
+              birdList: updatedSighting.birdList
+            };
+          }
+          return sighting;
+        })
 
-          setUser(user)
-         
-        }
-      
-        setSelectedOption([])
+        setUser(user)
 
-      setContestFormData(contestInit)
-      setFormData(Array(selectedOption.length).fill())
+      }
+
+      setContestFormData(contestInit);
+      setSelectedBird([]);
+      setBirdsDate(Array(selectedBird.length).fill())
       setAllUsers(prevUsers => {
         const userIndex = prevUsers.findIndex(u => u.id === returnedUser.id);
         if (userIndex !== -1) {
@@ -162,11 +177,13 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
             <Modal.Body>
               <div className="form-group">
                 <label htmlFor="formControlSelectBird">Valitse linnut</label>
+
+
                 <div id="formControlSelectBird">
                   <Select
-                    value={selectedOption}
+                    value={selectedBird}
                     isMulti
-                    onChange={setSelectedOption}
+                    onChange={setSelectedBird}
                     options={groupedOptions}
                     getOptionLabel={(option) => option.fi}
                     getOptionValue={(option) => option.fi}
@@ -175,89 +192,89 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
                 </div>
               </div>
 
-            
-              {selectedOption.length === 0 ? (
+
+              {selectedBird.length === 0 ? (
                 <p>Valitse vähintään yksi lintu</p>
               ) : (
                 <div>
-                 
 
-                    <form onSubmit={handleSubmit}>
+
+                  <form onSubmit={handleSubmit}>
                     <div className="form-group">
                       <label htmlFor="formControlAddDates">Lisää havainnon päivämäärä</label>
                       <div id="formControlAddDates">
-                        {selectedOption.map((item, index) => (
+                        {selectedBird.map((item, index) => (
                           <div key={index}>
                             <CustomInput
                               onChange={(event) => handleSelectChange(index, event)}
-                              value={formData[index] ? formData[index] : ''}
+                              value={birdsDate[index] ? birdsDate[index] : ''}
                               name="kilometers"
                               type={'text'}
                               placeholder={'päivämäärä'}
-                              inputTitle={selectedOption[index].label} />
+                              inputTitle={selectedBird[index].label} />
                           </div>
-                        
+
                         ))}
                       </div>
-                      <br/>
+                      <br />
 
-                      </div>
+                    </div>
 
-                      <div className="form-group">
+                    <div className="form-group">
                       <label htmlFor="formControlAddDates">Lisää kuljetut kilometrit</label>
                       <div id="formControlAddDates">
-                      <CustomInput
-                        onChange={handleSecInputChange}
-                        value={contestFormData.kilometers}
-                        name="kilometers"
-                        type={'text'}
-                        placeholder={'kilometrit'}
-                        inputTitle={"kilometrit"} />
-                          </div>
+                        <CustomInput
+                          onChange={handleSecInputChange}
+                          value={contestFormData.kilometers}
+                          name="kilometers"
+                          type={'text'}
+                          placeholder={'kilometrit'}
+                          inputTitle={"kilometrit"} />
                       </div>
+                    </div>
 
-                      <div className="form-group">
+                    <div className="form-group">
                       <label htmlFor="formControlAddDates">Lisää spontaanit havainnot</label>
                       <div id="formControlAddDates">
-                      <CustomInput
-                        onChange={handleSecInputChange}
-                        value={contestFormData.spontaneous}
-                        name="spontaneous"
-                        type={'text'}
-                        placeholder={'spondet'}
-                        inputTitle={'spondet'} />
-                          </div>
+                        <CustomInput
+                          onChange={handleSecInputChange}
+                          value={contestFormData.spontaneous}
+                          name="spontaneous"
+                          type={'text'}
+                          placeholder={'spondet'}
+                          inputTitle={'spondet'} />
                       </div>
+                    </div>
 
-                      <div className="form-group">
+                    <div className="form-group">
                       <label htmlFor="formControlAddDates">Lisää paikkakunta</label>
                       <div id="formControlAddDates">
-                      <CustomInput
-                        onChange={handleSecInputChange}
-                        value={contestFormData.region}
-                        name="region"
-                        type={'text'}
-                        placeholder={'region'}
-                        inputTitle={'region'} />
-                          </div>
+                        <CustomInput
+                          onChange={handleSecInputChange}
+                          value={contestFormData.region}
+                          name="region"
+                          type={'text'}
+                          placeholder={'region'}
+                          inputTitle={'region'} />
                       </div>
+                    </div>
 
-                      <div className="form-group">
+                    <div className="form-group">
                       <label htmlFor="formControlAddDates">Retkeillyt tunnit</label>
                       <div id="formControlAddDates">
-                      <CustomInput
-                        onChange={handleSecInputChange}
-                        value={contestFormData.hours}
-                        name="hours"
-                        type={'text'}
-                        placeholder={'hours'}
-                        inputTitle={'hours'} />
-                          </div>
+                        <CustomInput
+                          onChange={handleSecInputChange}
+                          value={contestFormData.hours}
+                          name="hours"
+                          type={'text'}
+                          placeholder={'hours'}
+                          inputTitle={'hours'} />
                       </div>
-                   
-                    </form>
-                  </div>
-         
+                    </div>
+
+                  </form>
+                </div>
+
 
               )
               }
