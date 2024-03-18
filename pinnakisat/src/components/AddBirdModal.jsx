@@ -14,8 +14,8 @@ import {
 
 function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllUsers, setSighting, handleSightingAdd }) {
 
+  const [isModalOpen, setIsModalOpen] = useState(false); // New state variable to track modal open/close
 
-  console.log(groupedOptions)
   const contestInit = {
     contestId: '',
     kilometers: '',
@@ -25,8 +25,6 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
     birds: []
   }
   const [selectedBird, setSelectedBird] = useState([]);
-  console.log(selectedBird)
-
   const [contestFormData, setContestFormData] = useState(contestInit)
   const [birdsDate, setBirdsDate] = useState(Array(selectedBird.length).fill());
 
@@ -34,13 +32,15 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
     setShowModal(false)
     setContestFormData(contestInit);
     setBirdsDate(Array(selectedBird.length).fill())
-    setSelectedBird([]);
+    setSelectedBird([])
+    setIsModalOpen(false) // Update isModalOpen state when closing modal
   }
 
   console.log(user.sightings)
 
 
   useEffect(() => {
+    if (showModal) {
     if (user.sightings.length > 0) {
       const userSighting = user.sightings.find(sighting => sighting.contest === contest);
       if (userSighting) {
@@ -66,7 +66,8 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
         setContestFormData(contestInit);
       }
     }
-  }, [user.sightings, contest]);
+  }
+  }, [showModal]);
 
 
   const handleSelectChange = (index, event) => {
@@ -86,6 +87,7 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
 
   //EI NÄIN VAAN LUO UUSI TIETUE AIEMPIEN DATOJEN POHJALTA
   const handleSubmit = (event) => {
+    event.preventDefault();
     let birdObject = { name: '', date: '' }
     let addingBirds = []
 
@@ -140,7 +142,7 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
         })
 
         setUser(user)
-
+        setIsModalOpen(false); // Update isModalOpen state after form submission
       }
 
       setContestFormData(contestInit);
@@ -168,8 +170,8 @@ function AddBirdModal({ showModal, setShowModal, contest, user, setUser, setAllU
     <div className="modal fade" id="exampleModalScrollable" tabIndex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
       <div className="modal-dialog modal-dialog-scrollable" role="document">
 
-        <Modal show={showModal} onHide={handleCloseModal}>
-          <Modal.Header closeButton>
+      <Modal show={showModal} onHide={handleCloseModal} onShow={() => setIsModalOpen(true)}>
+                  <Modal.Header closeButton>
             <Modal.Title>Lisää havainto </Modal.Title>
           </Modal.Header>
           <div className="modal-body">
