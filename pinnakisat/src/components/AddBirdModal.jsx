@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import CustomInput from './CustomInput'
 import sightingService from '../services/sightings';
 import Select from 'react-select';
+import DatePicker from 'react-datepicker'
+import "react-datepicker/dist/react-datepicker.css";
 
 import {
   groupedOptions, sorsalinnut, kanalinnut, kuikkalinnut, uikkulinnut, ulappalinnut, pelikaanilinnut, haikaralinnut,
@@ -43,6 +45,7 @@ function AddBirdModal({ showModal, setShowModal, contests, contestId, user }) {
 
     if (thisContest) {
       const userSighting = thisContest.sightings.find(sighting => sighting.userId.id === user.id && sighting.contestId === contestId);
+      console.log(userSighting, "FUCK")
       if (userSighting) {
         setBirdsDate(userSighting.birdList.map(bird => bird.date));
         setSelectedBird(groupedOptions.reduce((acc, curr) => {
@@ -108,7 +111,7 @@ const handleSubmit = (event) => {
   }
 
   sightingService.createSighting(newObject).then(returnedContest => {
-    console.log(returnedContest)
+    console.log(returnedContest, "TÄMÄ ON OIKEIN")
     // const contestExists = user.sightings.some(sighting => sighting.contest === newObject.contestId);
     // ////console.log(user, newObject.contestId)
 
@@ -204,15 +207,17 @@ return (
                     <label htmlFor="formControlAddDates">Lisää havainnon päivämäärä</label>
                     <div id="formControlAddDates">
                       {selectedBird.map((item, index) => (
-                        <div key={index}>
-                          <CustomInput
-                            onChange={(event) => handleSelectChange(index, event)}
-                            value={birdsDate[index] ? birdsDate[index] : ''}
-                            name="kilometers"
-                            type={'text'}
-                            placeholder={'päivämäärä'}
-                            inputTitle={selectedBird[index].label} />
-                        </div>
+                       <div key={index}>
+                       <label >{selectedBird[index].label}</label>
+                     <DatePicker
+                       selected={birdsDate[index]}
+                       onChange={date => handleSelectChange(index, { target: { name: "kilometers", value: date } })}
+                       showIcon
+                       dateFormat="dd/MM/yyyy"
+                       placeholderText={'Havainnon päivämäärä'}
+                     />
+                   </div>
+
 
                       ))}
                     </div>

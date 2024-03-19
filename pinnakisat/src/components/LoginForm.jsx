@@ -1,14 +1,15 @@
 import CustomInput from "./CustomInput"
-
 import Stack from 'react-bootstrap/Stack';
+import '../custom_styles.css';
 
 
 const LoginForm = ({ handleLogin, handleLoginInputChange, loginFormData }) => {
 
 
   return (
+    <div className="centered-container">
     <div>
-      <Stack gap={1}>
+      <Stack gap={1} className="text-center">
 
         <h2>Kirjaudu</h2>
 
@@ -38,6 +39,7 @@ const LoginForm = ({ handleLogin, handleLoginInputChange, loginFormData }) => {
 
         </form>
       </Stack>
+    </div>
     </div>
   )
 }

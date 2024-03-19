@@ -8,9 +8,9 @@ const Notification = ({ message }) => {
 
 
   return (
-    <div>
-      <Alert variant={message.type}>
-       {message.message}
+    <div className="d-flex justify-content-center">
+      <Alert variant={message.type} className="text-center">
+      <span style={{ fontSize: '1.0rem', fontWeight: 'bold', color: '#333' }}>{message.message}</span>
        </Alert>
     </div>
   )

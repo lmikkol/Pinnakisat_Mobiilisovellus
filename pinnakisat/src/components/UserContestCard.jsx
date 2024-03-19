@@ -2,7 +2,7 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button'
 import { Link } from 'react-router-dom'
 
-function UserContestCard({ contest, handleShowModal, setContest, handleRemoveContestFromUser }) {
+function UserContestCard({ contest, handleShowModal, setContest, handleRemoveContestFromUser, loggedInUser }) {
   console.log(contest)
 
   const TEST = ({ event }) => {
@@ -16,6 +16,7 @@ function UserContestCard({ contest, handleShowModal, setContest, handleRemoveCon
   const datesForm = (<><p>{formattedDates.start} - {formattedDates.end}</p></>)
 
   return (
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
     <Card style={{ width: '36rem' }}>
       <Card.Body style={{ position: "relative" }}>
         <Card.Title>{contest.name}</Card.Title>
@@ -32,6 +33,7 @@ function UserContestCard({ contest, handleShowModal, setContest, handleRemoveCon
         </Button>
       </Card.Body>
     </Card>
+    </div>
 
 
 

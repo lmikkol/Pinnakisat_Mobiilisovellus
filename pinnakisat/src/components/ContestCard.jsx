@@ -58,11 +58,12 @@ function ContestCard({ contest, handleAddUserToContest, loggedinUser, handleRemo
 
   return (
     <>
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
     <Card style={{ width: '36rem' }} className="shadow-sm mb-1 bg-white rounded">
       <Card.Body style={contest.status === "archived" ? styles.customCard : contest.status === "upcoming" ? styles.upcomingCard : {}}>
         <Card.Title>{contest.name}</Card.Title>
-        <Card.Subtitle className="mb-2 text-muted">{formatDates()}</Card.Subtitle>
-        <Card.Text>
+        <Card.Subtitle className="mb-3 text-muted">{formatDates()}</Card.Subtitle>
+        <Card.Text >
           {contest.description}
         </Card.Text>
         <div>
@@ -82,7 +83,7 @@ function ContestCard({ contest, handleAddUserToContest, loggedinUser, handleRemo
               <p>Et ole osallistunut tähän kilpailuun.</p>
             )}
             {isParticipant ? (
-              <Button name={contest.id} type="button" className="btn btn-warning" onClick={(event) => { showConfirmation(); handleRemoveContestFromUser(event); }}>
+              <Button name={contest.id} type="button" className="btn btn-warning" onClick={(event) => { showConfirmation(event) }}>
               Poistu kisasta
             </Button>
             ) : (
@@ -99,6 +100,7 @@ function ContestCard({ contest, handleAddUserToContest, loggedinUser, handleRemo
     onHide={hideConfirmation}
     onConfirm={confirmLeaveContest}
   />
+  </div>
   </>
   );
 }

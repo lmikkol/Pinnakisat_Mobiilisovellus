@@ -28,19 +28,21 @@ import {
 const Home = () => {
 
   return (
-    <div>
-      <h2>PLACEHOLDER.</h2>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <div>
+        <h2>PLACEHOLDER.</h2>
+      </div>
     </div>
   )
 }
 
-const CreateNewContest = () => {
-  return (
-    <div>
-      <ContestForm handleSubmit={handleSubmit} handleInputChange={handleInputChange} contestFormData={contestFormData} />
-    </div>
-  )
-}
+// const CreateNewContest = () => {
+//   return (
+//     <div>
+//       <ContestForm handleSubmit={handleSubmit} handleInputChange={handleInputChange} contestFormData={contestFormData} />
+//     </div>
+//   )
+// }
 
 const Login = ({ handleLogin, setLoginFormData, loginFormData }) => {
 
@@ -85,9 +87,6 @@ const App = () => {
   }
 
   //#region STATE CREDENTIALS
-  // form for objects, used by contestFormData
-  // when submit button is pressed
-  // resets the contest form to default
   const contestInit = {
     name: '',
     description: '',
@@ -111,6 +110,7 @@ const App = () => {
     passwordAgain: ''
   }
   //#endregion STATE CREDENTIALS END
+
   //#region STATES START
   // const [newContest, setNewContest] = useState('')
   const [scores, setScores] = useState(null)
@@ -189,12 +189,9 @@ const App = () => {
   };
 
 
-
-
   //#region KISAAN OSALLISTUMINEN JA POISTUMINEN START
-  //#region KISAAN OSALLISTUMINEN JA POISTUMINEN START
-  const handleRemoveContestFromUser = async (event) => {
-    const contestId = event.target.name
+  const handleRemoveContestFromUser = async (contestid) => {
+    const contestId = contestid
 
     try {
       await userService.removeContest(contestId, loggedinUser.id);
@@ -260,7 +257,7 @@ const App = () => {
     event.preventDefault();
 
     // console.log(contestFormData)
-    // console.log(event.currentTarget)
+    console.log(event.currentTarget, "TÄÄLLÄ OLLAAN")
 
     const currentDate = new Date();
     const startDate = new Date(contestFormData.date_begin);
@@ -293,32 +290,24 @@ const App = () => {
         setContests(contests.concat(returnedContest));
         setUserContest(userContest.concat(returnedContest));
         setContestFormData(contestInit);
-        
+
         setNotification({
           type: "success",
           message: "Kilpailun lisääminen onnistui!"
         })
         alertTimer()
-        // setContestFormData(prevFormData => ({
-          //   ...prevFormData,
-          //   name: '',
-          //   description: '',
-          //   date_begin: '',
-          //   date_end: '',
-          //   url: '',
-          //   status: ''
-          // }));
-          closeModalCallback();
-          clearDateFieldsCallback();
+
+        closeModalCallback();
+        clearDateFieldsCallback();
+      })
+      .catch(error => {
+        setNotification({
+          type: "warning",
+          message: "Kilpailun lisäyksessä tapahtui virhe, tarkista kentät ja yritä uudelleen."
         })
-        .catch(error => {
-          setNotification({
-            type: "warning",
-            message: "Kilpailun lisäyksessä tapahtui virhe, tarkista kentät ja yritä uudelleen."
-          })
-          alertTimer()
-        });
-      };
+        alertTimer()
+      });
+  };
 
   // Handles submit buttons functionality
   // creating a new contest object on click
@@ -337,7 +326,6 @@ const App = () => {
   // };
 
 
-  // lisätty uutena testailua varten...
   const handleRegisterInputChange = (event) => {
     const { name, value } = event.target;
     setRegisterFormData((prevFormData) => ({
@@ -346,7 +334,7 @@ const App = () => {
     }));
   }
 
-  function isValidEmail(email) {
+  const isValidEmail = (email) => {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return pattern.test(email)
   }
@@ -354,6 +342,7 @@ const App = () => {
   // Käyttäjän luomisen käsittelijä
   const handleRegistration = async (event) => {
     event.preventDefault()
+
 
     if (!registerFormData.password || registerFormData.password.length < 5 || !/\d/.test(registerFormData.password)) {
       setNotification({
@@ -517,7 +506,7 @@ const App = () => {
   // FILTTERÖI VAIN KÄYTTÄJÄN KISAT
   const birdSightModal = () => {
     return (
-      <AddBirdModal showModal={showModal} setShowModal={setShowModal} contest={contest} user={loggedinUser} setUser={setUser} setAllUsers={setAllUsers} setSighting={setSighting} handleSightingAdd={handleSightingAdd} handleSubmit={handleSubmit} />
+      <AddBirdModal showModal={showModal} setShowModal={setShowModal} contests={contests} contestId={contest} user={loggedinUser} setUser={setUser} setAllUsers={setAllUsers} setSighting={setSighting} handleSightingAdd={handleSightingAdd} handleSubmit={handleSubmit} />
     )
   }
 
@@ -548,16 +537,19 @@ const App = () => {
 
       <Header header={"Pinnakisapalvelu"} />
       {NotificationMessages()}
-      <div>
-        <i>Pinnakisapalvelu, jossa käyttäjät voivat osallistua kilpailuihin ja lisätä lintuhavaintojaan.</i>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+        <div style={{ margin: '5px' }}>
+          <i>Pinnakisapalvelu, jossa käyttäjät voivat osallistua kilpailuihin ja lisätä lintuhavaintojaan.</i>
+        </div>
       </div>
-      <div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', margin: '5px' }}>
         <Link style={padding} to="/">Etusivu</Link>
         <Link style={padding} to="/contests">Kilpailut</Link>
 
         {loggedinUser ? (
           <><Link style={padding} to="/usercontest">Omat kilpailut</Link>
-            <em>{loggedinUser.name} logged in</em></>
+            <em className="text-center-align mt-1">{loggedinUser.name} logged in</em></>
         ) : (
           <><Link style={padding} to="/registration">Rekisteröidy</Link>
             <Link style={padding} to="/login">Kirjaudu</Link></>
@@ -566,6 +558,7 @@ const App = () => {
         {loggedinUser && <Link style={padding} to="/logout">LogOut</Link>}
         {/* <Link style={padding} to="/contest-scores">Tulokset</Link> */}
         {/* {loggedinUser && loggedinUser.userRole===0 && <Link style={padding} to="/add-contest">Lisää kilpailu</Link>} */}
+
       </div>
 
       <Routes>
