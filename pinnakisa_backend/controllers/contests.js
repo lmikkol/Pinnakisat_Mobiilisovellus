@@ -7,7 +7,7 @@ contestRouter.get('/', async (request, response) => {
 	// Contest.find({}).then(contests => {
 		// })
 		const contests = await Contest
-		.find({}).sort([['date_end', -1]]);
+		.find({}).sort([['date_end', -1]]).populate('sightings')
 		response.json(contests)
 })
 

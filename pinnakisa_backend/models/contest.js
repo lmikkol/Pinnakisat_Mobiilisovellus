@@ -26,7 +26,13 @@ const contestSchema = new mongoose.Schema({
 	status: {
 		type: String,
 		// required: true
-	}
+	},
+	sightings : [
+		{
+		  type: mongoose.Schema.Types.ObjectId,
+		  ref: 'Sighting',
+		}
+	  ],
 },
 	{
 		timestamps: true

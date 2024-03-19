@@ -20,7 +20,11 @@ const findingSchema = new mongoose.Schema({
     spontaneous: {
         type: String
     },
-    contest: {
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    contestId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Contest'
     },

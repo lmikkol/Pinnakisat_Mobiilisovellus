@@ -1,24 +1,27 @@
 const sightingsRouter = require('express').Router()
 const Sighting = require('../models/sighting')
 const User = require('../models/user')
+const Contest = require('../models/contest')
 
 sightingsRouter.get('/', async (request, response) => {
   Sighting.find({}).then(sightings => {
     response.json(sightings)
   })
-  // const sightings = await Sighting
-  // 	.find({})
 })
 
 sightingsRouter.post('/', async (request, response, next) => {
   const body = request.body  
 
+
   try {
     // Check if a sighting with the same contestId exists
-    let existingSighting = await Sighting.findOne({ contest: body.contestId });
-  
+    let existingSighting = await Sighting.findOne({ userId: body.userId, contestId: body.contestId });
+
     if (existingSighting) {
+      console.log("VANHA LÖYTYI BÄKISTÄ")
       // If the sighting exists, update it with the new data
+      existingSighting.userId = body.userId;
+      existingSighting.contestId = body.contestId;
       existingSighting.region = body.region;
       existingSighting.distanceKM = body.kilometers;
       existingSighting.hours = body.hours;
@@ -26,36 +29,40 @@ sightingsRouter.post('/', async (request, response, next) => {
       existingSighting.birdList = body.birds;
   
       const updatedSighting = await existingSighting.save();
-  
-      // Update the user's sightings with the updated sighting
-      const updatedUser = await User.findByIdAndUpdate(body.userId, { $addToSet: { sightings: updatedSighting.id } }, { new: true }).populate('sightings');
-  
-      if (!updatedUser) {
-        return response.status(404).json({ message: 'User not found' });
+      const newContest = await Contest.findOne({
+        _id: body.contestId,
+        sightings: updatedSighting.id
+      }).populate('sightings');
+
+
+      if (!newContest) {
+        return response.status(404).json({ message: 'Contest not found' });
       }
-  
-      return response.json(updatedUser);
+      return response.json(newContest);
+
+
     } else {
       // If no existing sighting is found, create a new one
       let newSighting = new Sighting({
+        userId: body.userId,
+        contestId: body.contestId,
         region: body.region,
         distanceKM: body.kilometers,
         hours: body.hours,
         spontaneous: body.spontaneous,
-        contest: body.contestId,
         birdList: body.birds
       });
   
       const savedSighting = await newSighting.save();
   
       // Update the user's sightings with the new sighting
-      const updatedUser = await User.findByIdAndUpdate(body.userId, { $addToSet: { sightings: savedSighting.id } }, { new: true }).populate('sightings');
+      const updatedContest = await Contest.findByIdAndUpdate(body.contestId, { $addToSet: { sightings: savedSighting.id } }, { new: true }).populate('sightings');
   
-      if (!updatedUser) {
-        return response.status(404).json({ message: 'User not found' });
+      if (!updatedContest) {
+        return response.status(404).json({ message: 'Contest not found' });
       }
   
-      return response.json(updatedUser);
+      return response.json(updatedContest);
     }
   } catch (error) {
     console.error('Error:', error);
