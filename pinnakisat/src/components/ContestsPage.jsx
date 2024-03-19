@@ -13,22 +13,33 @@ registerLocale('fi', fi)
 import contestService from '../services/contests'
 
 
-const ContestsPage = ({ contests, handleAddUserToContest, loggedinUser, handleRemoveContestFromUser, handleSubmit, handleInputChange, contestFormData, setContests }) => {
+const ContestsPage = ({ contests, handleAddUserToContest, loggedinUser, handleRemoveContestFromUser, handleSubmit, handleInputChange, contestFormData, setContestFormData }) => {
 
 
-  const [showModal, setShowModal] = useState(false); // State to manage modal visibility
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [currentDate, setCurrentDate] = useState(new Date());
-
+  const [showModal, setShowModal] = useState(false)
+  const [startDate, setStartDate] = useState(null)
+  const [endDate, setEndDate] = useState(null)
+  const [currentDate, setCurrentDate] = useState(new Date())
 
   const handleModalClose = () => {
     setShowModal(false);
     setStartDate(null);
     setEndDate(null)
+    // setContestFormData(prevFormData => {
+    //   return{
+    //   ...prevFormData,
+    //   name: '',
+    //   description: '',
+    //   url: ''
+    // }})
+    // setContestFormData.name('')
+    // setContestFormData.description('')
+    // setContestFormData('')
+    window.location.reload()
+    // console.log(contestFormData, 'MITÄS TÄÄLTÄ VITTU LÖYTYY?!?!')
   }
   const handleModalShow = () => setShowModal(true);
-  console.log(startDate, currentDate)
+  // console.log(startDate, currentDate)
 
   const sortedContests = contests.sort((a, b) => {
     const statusOrder = {
@@ -60,7 +71,7 @@ const ContestsPage = ({ contests, handleAddUserToContest, loggedinUser, handleRe
                 <Modal.Title>Contest Form</Modal.Title>
               </Modal.Header>
               <Modal.Body >
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={(event) => handleSubmit(event, handleModalClose, () => { setStartDate(null), setEndDate(null); })}>
                   <CustomInput
                     onChange={handleInputChange}
                     value={contestFormData ? contestFormData.name : ''}
@@ -109,53 +120,6 @@ const ContestsPage = ({ contests, handleAddUserToContest, loggedinUser, handleRe
                       minDate={(startDate > currentDate) ? startDate : currentDate}
                     />
                   </div>
-
-                  {/* Datepicker start_date */}
-                  {/* <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={{ marginBottom: '5px' }}>Aloituspäivämäärä</label>
-                    <DatePicker
-                      locale={"fi"}
-                      showIcon
-                      // isClearable
-                      selected={startDate}
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="Aloituspäivämäärä"
-                      onChange={(date) => {
-                        setStartDate(date);
-                        handleInputChange({ target: { name: "date_begin", value: date } });
-                      }}
-                      customInput={
-                        <input
-                          className="form-control" // Apply Bootstrap form-control class or any desired styles
-                          style={{ width: '190px', paddingRight: '5px' }} // Add padding to accommodate the clear button
-                        />
-                      }
-                    />
-                  </div> */}
-                  {/* Datepicker end_date */}
-
-                  {/* <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={{ marginBottom: '5px' }}>Päättymispäivämäärä</label>
-                    <DatePicker
-                      locale={"fi"}
-                      showIcon
-                      // isClearable
-                      selected={endDate}
-                      dateFormat="dd/MM/yyyy"
-                      // dateFormat="P"
-                      placeholderText="Päättymispäivämäärä"
-                      onChange={(date) => {
-                        setEndDate(date);
-                        handleInputChange({ target: { name: "date_end", value: date } });
-                      }}
-                      customInput={
-                        <input
-                          className="form-control" // Apply Bootstrap form-control class or any desired styles
-                          style={{ width: '190px', paddingRight: '30px' }} // Add padding to accommodate the clear button
-                        />
-                      }
-                    />
-                  </div> */}
 
                   <CustomInput
                     onChange={handleInputChange}

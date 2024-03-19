@@ -2,9 +2,27 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button'
 import { Link } from 'react-router-dom'
 
+import ConfirmationModal from './ConfirmationModal';
+import { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Placeholder for styles
 
 function ContestCard({ contest, handleAddUserToContest, loggedinUser, handleRemoveContestFromUser }) {
 
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+
+  const showConfirmation = () => {
+    setShowConfirmationModal(true);
+  }
+  
+  const hideConfirmation = () => {
+    setShowConfirmationModal(false);
+  }
+
+  const confirmLeaveContest = () => {
+    handleRemoveContestFromUser(contest.id);
+    hideConfirmation();
+    console.log(contest.id)
+  }
 
   const styles = {
     invalid: {
@@ -19,6 +37,9 @@ function ContestCard({ contest, handleAddUserToContest, loggedinUser, handleRemo
     },
     customCard: {
       background: "#bebebe"
+    },
+    upcomingCard: {
+      background: "#76ac76"
     },
   };
 
@@ -36,16 +57,19 @@ function ContestCard({ contest, handleAddUserToContest, loggedinUser, handleRemo
   // style={contest.status === "archived" ? styles.customCard : {}}
 
   return (
-
+    <>
     <Card style={{ width: '36rem' }} className="shadow-sm mb-1 bg-white rounded">
-      <Card.Body style={contest.status === "archived" ? styles.customCard : {}}>
+      <Card.Body style={contest.status === "archived" ? styles.customCard : contest.status === "upcoming" ? styles.upcomingCard : {}}>
         <Card.Title>{contest.name}</Card.Title>
         <Card.Subtitle className="mb-2 text-muted">{formatDates()}</Card.Subtitle>
-        <Link to={`/contests/${contest.id}`}>Katso tulokset</Link>
-
         <Card.Text>
           {contest.description}
         </Card.Text>
+        <div>
+        {contest.status !== "upcoming" && (
+          <Link to={`/contests/${contest.id}`}>Katso tulokset</Link>
+        )}
+      </div>
 
         {contest.status === "archived" && (
           <p>Kilpailu on päättynyt.</p>
@@ -58,9 +82,9 @@ function ContestCard({ contest, handleAddUserToContest, loggedinUser, handleRemo
               <p>Et ole osallistunut tähän kilpailuun.</p>
             )}
             {isParticipant ? (
-              <Button name={contest.id} type="button" className="btn btn-warning" onClick={(event) => handleRemoveContestFromUser(event)}>
-                Poistu kisasta
-              </Button>
+              <Button name={contest.id} type="button" className="btn btn-warning" onClick={(event) => { showConfirmation(); handleRemoveContestFromUser(event); }}>
+              Poistu kisasta
+            </Button>
             ) : (
               <Button name={contest.id} type="button" className="btn btn-success" onClick={() => handleAddUserToContest(contest.id)} >
                 Osallistu kisaan
@@ -70,6 +94,12 @@ function ContestCard({ contest, handleAddUserToContest, loggedinUser, handleRemo
         )}
       </Card.Body>
     </Card>
+    <ConfirmationModal
+    show={showConfirmationModal}
+    onHide={hideConfirmation}
+    onConfirm={confirmLeaveContest}
+  />
+  </>
   );
 }
 

@@ -1,7 +1,9 @@
 /* eslint-disable react/prop-types */
 const CustomInput = ({ ...props }) => {
 
-  const isEmpty = props.value.trim() === '';
+  // check if props.value exists before calling trim() on it
+  // if props.value is undefined then isEmpty defaults to true
+  const isEmpty = props.value ? props.value.trim() === '' : true;
 
   const styles = {
     invalid: {
@@ -25,7 +27,7 @@ const CustomInput = ({ ...props }) => {
         <input
           type={props.type}
           placeholder={props.placeholder}
-          value={props.value}
+          value={isEmpty ? '' : props.value}
           onChange={props.onChange}
           name={props.name}
           style={isEmpty && props.isRequired ? styles.invalid : {}}

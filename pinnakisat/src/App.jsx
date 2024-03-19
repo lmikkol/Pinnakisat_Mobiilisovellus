@@ -54,6 +54,15 @@ const Login = ({ handleLogin, setLoginFormData, loginFormData }) => {
     }));
   }
 
+  useEffect(() => {
+    return () => {
+      setLoginFormData({
+        username: '',
+        password: '',
+      });
+    };
+  }, [setLoginFormData]);
+
   return (
     <div>
       <LoginForm handleLogin={handleLogin} handleLoginInputChange={handleLoginInputChange} loginFormData={loginFormData} />
@@ -193,6 +202,11 @@ const App = () => {
         ...prevUser,
         contests: prevUser.contests.filter(id => id !== contestId)
       }));
+      setNotification({
+        type: "success",
+        message: "Poistuit kilpailusta onnistuneesti!"
+      })
+      alertTimer()
     } catch (error) {
 
       //FEAT: LISÄÄ NOTIFICAATIOT
@@ -234,8 +248,6 @@ const App = () => {
     }
   };
 
-
-
   //#endregion KISAAN OSALLISTUMINEN JA POISTUMINEN END
 
 
@@ -244,18 +256,18 @@ const App = () => {
     //console.log("ONNISTUI SAATANA", sightings)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event, closeModalCallback, clearDateFieldsCallback) => {
     event.preventDefault();
 
-    console.log(contestFormData)
-    console.log(event.currentTarget)
-    
+    // console.log(contestFormData)
+    // console.log(event.currentTarget)
+
     const currentDate = new Date();
     const startDate = new Date(contestFormData.date_begin);
     const endDate = new Date(contestFormData.date_end);
-  
+
     let newStatus = '';
-  
+
     if (startDate > currentDate) {
       newStatus = "upcoming";
     } else if (currentDate >= startDate && currentDate <= endDate) {
@@ -263,42 +275,56 @@ const App = () => {
     } else {
       newStatus = "archived";
     }
-  
+
     // Update status in contestFormData
     const updatedFormData = {
       ...contestFormData,
       status: newStatus
     };
-  
+
     // Create the contest with updatedFormData
     contestService.createContest(updatedFormData)
       .then(returnedContest => {
-        // Extract the updated status from the returnedContest
         const updatedStatus = returnedContest.status;
-        // Update local state with the updated status
         setContestFormData({
           ...contestFormData,
           status: updatedStatus
         });
-        // Update contests and userContest state if necessary
         setContests(contests.concat(returnedContest));
         setUserContest(userContest.concat(returnedContest));
-        // Reset contestFormData to its initial state
         setContestFormData(contestInit);
-        // Perform any additional actions, such as displaying notifications
-      })
-      .catch(error => {
-        // Handle error response if needed
-        console.error('Error creating contest:', error);
-        // Perform error handling, such as displaying an error message
-      });
-  };
+        
+        setNotification({
+          type: "success",
+          message: "Kilpailun lisääminen onnistui!"
+        })
+        alertTimer()
+        // setContestFormData(prevFormData => ({
+          //   ...prevFormData,
+          //   name: '',
+          //   description: '',
+          //   date_begin: '',
+          //   date_end: '',
+          //   url: '',
+          //   status: ''
+          // }));
+          closeModalCallback();
+          clearDateFieldsCallback();
+        })
+        .catch(error => {
+          setNotification({
+            type: "warning",
+            message: "Kilpailun lisäyksessä tapahtui virhe, tarkista kentät ja yritä uudelleen."
+          })
+          alertTimer()
+        });
+      };
 
   // Handles submit buttons functionality
   // creating a new contest object on click
   // const handleSubmit = (event) => {
   //   event.preventDefault();
-  
+
   //   contestService
   //     .createContest(contestFormData)
   //     .then(returnedContest => {
@@ -320,10 +346,32 @@ const App = () => {
     }));
   }
 
+  function isValidEmail(email) {
+    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return pattern.test(email)
+  }
 
   // Käyttäjän luomisen käsittelijä
   const handleRegistration = async (event) => {
     event.preventDefault()
+
+    if (!registerFormData.password || registerFormData.password.length < 5 || !/\d/.test(registerFormData.password)) {
+      setNotification({
+        type: "danger",
+        message: "Salasanan on oltava vähintään 5 merkkiä pitkä ja sisältää 1 numero"
+      });
+      alertTimer();
+      return;
+    }
+
+    if (!registerFormData.email || !isValidEmail(registerFormData.email)) {
+      setNotification({
+        type: "danger",
+        message: "Sähköpostiosoite ei ole oikeassa muodossa. Sähköpostin tulee sisältää @ -merkki ja päättyä päätteeseen fi tai com."
+      })
+      alertTimer()
+      return;
+    }
 
     if (!registerFormData.password || registerFormData.password.length < 5 || !/\d/.test(registerFormData.password)) {
       setNotification({
@@ -444,7 +492,7 @@ const App = () => {
   const registerForm = () => {
     return (
       <div>
-        <RegisterForm handleRegistration={handleRegistration} handleRegisterInputChange={handleRegisterInputChange} registerFormData={registerFormData} />
+        <RegisterForm handleRegistration={handleRegistration} handleRegisterInputChange={handleRegisterInputChange} registerFormData={registerFormData} setRegisterFormData={setRegisterFormData} />
       </div>
     )
   }

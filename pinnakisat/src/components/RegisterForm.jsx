@@ -1,9 +1,32 @@
 import CustomInput from "./CustomInput"
 import Stack from 'react-bootstrap/Stack';
+import { useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 
 /// JATKA TÄSTÄ
 
-const RegisterForm = ({ handleRegistration, handleRegisterInputChange, registerFormData}) => {
+const RegisterForm = ({ handleRegistration, handleRegisterInputChange, registerFormData, setRegisterFormData}) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    return () => {
+      setRegisterFormData({
+        email: '',
+        firstName: '',
+        lastName: '',
+        password: '',
+        passwordAgain: ''
+      });
+    };
+  }, [setRegisterFormData]);
+
+  // const handleRegisterInputChange = (event) => {
+  //   const { name, value } = event.target;
+  //   setRegisterFormData((prevFormData) => ({
+  //     ...prevFormData,
+  //     [name]: value,
+  //   }));
+  // };
 
   return (
     <div>
