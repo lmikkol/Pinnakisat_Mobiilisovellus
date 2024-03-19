@@ -4,7 +4,7 @@ const User = require('../models/user')
 const Contest = require('../models/contest')
 
 sightingsRouter.get('/', async (request, response) => {
-  Sighting.find({}).then(sightings => {
+  Sighting.find({}).populate('userId', {firstname: 1, lastname: 1}).then(sightings => {
     response.json(sightings)
   })
 })

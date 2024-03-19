@@ -7,17 +7,6 @@ import { Fragment } from 'react';
 const UserScorePage = ({ users, contests }) => {
   const [openRows, setOpenRows] = useState([]);
 
-
-
-  const id = useParams().id
-
-  const contestName = contests.map(contest => { if (contest.id === id) return contest.name })
-
-
-  const participatedUsers = users.filter(user => {
-    return user.sightings.some(sighting => sighting.contest === id);
-  });
-
   const toggleRow = (rowIndex) => {
     setOpenRows((prevOpenRows) =>
       prevOpenRows.includes(rowIndex)
@@ -25,28 +14,30 @@ const UserScorePage = ({ users, contests }) => {
         : [...prevOpenRows, rowIndex]
     );
   };
-  const calculatePoints = (sightings) => {
-    let points = 0
-    sightings.forEach((sighting) => {
-      if (sighting.contest === id) {
-        sighting.birdList.forEach(b => points += 1)
-      }
-    })
-    return points;
+
+  const id = useParams().id
+
+
+  const thisContest = contests.filter(contest => contest.id === id)[0]
+
+  if (!thisContest) {
+    return <h2>No contest found with the provided id.</h2>;
   }
 
-  participatedUsers.sort((a, b) => calculatePoints(b.sightings) - calculatePoints(a.sightings));
-  
+  const thisSightings = thisContest.sightings
 
-  if (participatedUsers.length === 0) {
 
-    return ( 
-      <><h2>{contestName}</h2><p>No users have participated in this contest.</p></> )
+  thisSightings.sort((a, b) => b.birdList.length - a.birdList.length)
+
+  if (thisSightings.length === 0) {
+
+    return (
+      <><h2>{thisContest.name}</h2><p>No users have participated in this contest.</p></>)
   }
 
   return (
     <>
-      <h2>{contestName}</h2>
+      <h2>{thisContest.name}</h2>
       <table>
         <thead>
           <tr>
@@ -56,33 +47,29 @@ const UserScorePage = ({ users, contests }) => {
           </tr>
         </thead>
         <tbody>
-          {participatedUsers.map((user, index) => (
+          {thisSightings.map((sighting, index) => (
             <Fragment key={index}>
               <tr className="table-primary" onClick={() => toggleRow(index)}>
-                <td>{user.email}</td>
+                <td>{sighting.userId.firstName} {sighting.userId.lastName}</td>
                 <td />
                 {/* TÄHÄN LASKETAAN KÄYTTÄJÄN PISTEET*/}
-                {<td>{calculatePoints(user.sightings)}</td>}
+                {<td>{sighting.birdList.length}</td>}
               </tr>
               {openRows.includes(index) && (
                 <tr>
                   <td />
                   <td colSpan="2">
                     <div>
-                      {/* Rendering subrow content */}
-                      {user.sightings && user.sightings.map((sighting) => {
-                        // Checking if the sighting is for the current contest
-                        if (sighting.contest === id) {
-                          return sighting.birdList.map((bird, idx) => (
-                            <div key={idx}>
-                              {/* Render subrow content here */}
-                              {bird.name} {/* Example property */}
-                            </div>
-                          ));
-                        }
-                        return null; // Return null if the condition doesn't match
-                      })}
+
+                      {sighting.birdList.map((bird, idx) => (
+                        <div key={idx}>
+                          {/* Render subrow content here */}
+                          {bird.name} {/* Example property */}
+                        </div>
+                      ))
+                      }
                     </div>
+
                   </td>
                 </tr>
               )}
@@ -95,3 +82,4 @@ const UserScorePage = ({ users, contests }) => {
 }
 
 export default UserScorePage;
+

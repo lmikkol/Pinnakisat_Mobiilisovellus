@@ -33,21 +33,17 @@ function AddBirdModal({ showModal, setShowModal, contests, contestId, user }) {
     setContestFormData(contestInit);
     setBirdsDate(Array(selectedBird.length).fill())
     setSelectedBird([])
-    setIsModalOpen(false) // Update isModalOpen state when closing modal
   }
 
 
 
   useEffect(() => {
-    //   if (showModal) {
     const thisContest = contests.find(contest => contest.id === contestId)
-    console.log(contests, contestId)
-    console.log("NO LÖYTY VITTU", thisContest)
+    console.log("MUUTTUUU", thisContest)
 
     if (thisContest) {
-      const userSighting = thisContest.sightings.find(sighting => sighting.userId === user.id && sighting.contestId === contestId);
+      const userSighting = thisContest.sightings.find(sighting => sighting.userId.id === user.id && sighting.contestId === contestId);
       if (userSighting) {
-        console.log("LÖYTYY havainto KÄYTTÄJÄLTÄ", userSighting)
         setBirdsDate(userSighting.birdList.map(bird => bird.date));
         setSelectedBird(groupedOptions.reduce((acc, curr) => {
           curr.options.forEach(option => {
@@ -145,7 +141,6 @@ const handleSubmit = (event) => {
     //  }
 
     //   setUser(user)
-    setIsModalOpen(false); // Update isModalOpen state after form submission
     //    }
 
     setContestFormData(contestInit);
@@ -173,7 +168,7 @@ return (
   <div className="modal fade" id="exampleModalScrollable" tabIndex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
     <div className="modal-dialog modal-dialog-scrollable" role="document">
 
-      <Modal show={showModal} onHide={handleCloseModal} onShow={() => setIsModalOpen(true)}>
+      <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Lisää havainto </Modal.Title>
         </Modal.Header>

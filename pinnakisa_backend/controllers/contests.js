@@ -7,7 +7,15 @@ contestRouter.get('/', async (request, response) => {
 	// Contest.find({}).then(contests => {
 		// })
 		const contests = await Contest
-		.find({}).sort([['date_end', -1]]).populate('sightings')
+		.find({}).sort([['date_end', -1]])
+		.populate({
+				path: 'sightings',
+				populate: {
+				  path: 'userId',
+				  model: 'User',
+				  select: 'firstName lastName' // Specify the fields you want to select from the User model
+				}
+			  });
 		response.json(contests)
 })
 
