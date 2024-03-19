@@ -9,6 +9,30 @@ const sightingsRouter = require('./controllers/sightings')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
+const Contest = require('./models/contest')
+
+
+async function updateProjectStatus() {
+  const nowDate = new Date()
+  try {
+      // Find the project and update its status
+      const project = await Contest.findOneAndUpdate(
+       { $and: [
+          { date_end: {$lt: nowDate} },
+           { status: {$not:{ $eq: "archived" } } }
+        ]},
+          { $set: { status: 'archived' } }
+      );
+
+      if (project) {
+          console.log('Project status updated successfully:', project);
+      } else {
+          console.log('Project not found.');
+      }
+  } catch (error) {
+      console.error('Error updating project status:', error);
+  }
+}
 
 
 mongoose.set('strictQuery', false)
@@ -16,23 +40,24 @@ mongoose.set('strictQuery', false)
 logger.info('connecting to', config.MONGODB_URI)
 
 mongoose.connect(config.MONGODB_URI)
-	.then(() => {
-        logger.info('connected to MongoDB')
-	})
-	.catch((error) => {
-        logger.error('error connecting to MongoDB:', error.message)
-	})
-    
-    app.use(cors())
-	app.use(express.json())
-	app.use(middleware.requestLogger)
+  .then(async () => {
+    logger.info('connected to MongoDB')
+    await updateProjectStatus();
+  })
+  .catch((error) => {
+    logger.error('error connecting to MongoDB:', error.message)
+  })
 
-    app.use('/api/contests', contestRouter)
-    app.use('/api/users', usersRouter)
-    app.use('/api/login', loginRouter)
-    app.use('/api/sightings', sightingsRouter)
+app.use(cors())
+app.use(express.json())
+app.use(middleware.requestLogger)
 
-    app.use(middleware.unknownEndpoint)
-    app.use(middleware.errorHandler)
+app.use('/api/contests', contestRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
+app.use('/api/sightings', sightingsRouter)
 
-    module.exports = app
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
+
+module.exports = app
