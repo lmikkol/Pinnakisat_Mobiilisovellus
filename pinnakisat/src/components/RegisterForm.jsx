@@ -3,6 +3,7 @@ import Stack from 'react-bootstrap/Stack';
 import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import '../custom_styles.css';
+import { Button } from 'react-bootstrap'
 
 /// JATKA TÄSTÄ
 
@@ -40,7 +41,7 @@ const RegisterForm = ({ handleRegistration, handleRegisterInputChange, registerF
               value={registerFormData.email}
               name="email"
               type={'text'}
-              placeholder={'Sähköposti'}
+              placeholder={'nimi@esimerkki.com'}
               inputTitle={"Sähköposti"}
               isRequired={true}
             />
@@ -84,7 +85,7 @@ const RegisterForm = ({ handleRegistration, handleRegisterInputChange, registerF
               inputTitle={"Vahvista salasana"}
               isRequired={true}
             />
-            <button type="submit">Rekisteröidy</button>
+            <Button variant="dark" type="submit">Rekisteröidy</Button>
           </form>
         </Stack>
       </div>

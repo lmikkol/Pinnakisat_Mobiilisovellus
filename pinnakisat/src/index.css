@@ -85,3 +85,91 @@ button {
   background-color: lightgrey;
 }
 
+div{
+  text-align: center;
+}
+
+.footer-card
+{
+  background-color: #dbf0ff;
+  text-align: center;
+}
+
+img {
+  width: 70%;
+}
+
+/* NavBar */
+.navbar {
+  background-color: #27272a;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.navbar a {
+  color: rgb(254, 254, 254);
+  display: inline-block;
+  width: 20%;
+  box-sizing: content-box;
+  line-height: 50px;
+  font-size: 16px;
+}
+
+.navbar a:hover {
+  background-color: #36363a;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #dbf0ff;
+}
+
+.logo-container {
+  margin-right: -200px;
+}
+
+.text-container {
+  flex: 1; 
+}
+
+/*Näkymä puhelimella*/
+
+@media only screen and (max-width: 900px) {
+  div {
+    text-align: center; /* Muutetaan tekstiasetus takaisin vasemmalle */
+  }
+
+  .header-container
+  {
+    font-size: 10px;
+  }
+
+  /* Header Container */
+  .header-container {
+    flex-direction: column; /* Asetetaan headerin sisältö pystysuoraan */
+  }
+
+  .logo-container {
+    margin-right: 0; /* Poistetaan logo containerin marginaali */
+    margin-bottom: 10px; /* Lisätään marginaali alaspäin */
+  }
+
+  .text-container {
+    width: 80%; /* Asetetaan tekstikontainerin leveys täysleveydelle */
+  }
+
+  /* Navbar */
+  .navbar {
+    flex-direction: column; /* Asetetaan navigaatio pystysuoraan */
+  }
+
+  .navbar a {
+    width: 100%; /* Asetetaan navigaatio linkkien leveys täysleveydelle */
+    line-height: 30px; /* Pienennetään linkkien riviväliä */
+  }
+}
+
