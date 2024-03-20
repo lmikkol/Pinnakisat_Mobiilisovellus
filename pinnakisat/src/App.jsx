@@ -180,25 +180,32 @@ const App = () => {
 
 //#region KISAAN OSALLISTUMINEN JA POISTUMINEN START
   const handleRemoveContestFromUser = async (event) => {
-    const contestId = event.target.name
+    const contestId = event.target.name;
 
     try {
-     await userService.removeContest(contestId, loggedinUser.id);
-    setUser(prevUser => ({
-      ...prevUser,
-      contests: prevUser.contests.filter(id => id !== contestId)
-    }));
+      await userService.removeContest(contestId, loggedinUser.id);
+      setUser(prevUser => ({
+        ...prevUser,
+        contests: prevUser.contests.filter(id => id !== contestId)
+      }));
+      
+      
+      setNotification({
+        type: "success",
+        message: "Kisa poistettu"
+      });
+      alertTimer();
     } catch (error) {
-      //FEAT: LISÄÄ NOTIFICAATIOT
       console.error('Error removing contest from user:', error);
       console.log('An error occurred while removing contest from user');
       setNotification({
         type: "warning",
-        message: "Virhe poistettaessa kisaa käyttäjältä"
-      })
-      alertTimer()
+        message: "Virhe poistettaessa kisaa"
+      });
+      alertTimer();
     }
-  }
+  };
+
   const handleAddUserToContest = async (contestId) => {
 
     try {
@@ -244,6 +251,11 @@ const App = () => {
         setContests(contests.concat(returnedContest))
         setUserContest(userContest.concat(returnedContest))
         setContestFormData(contestInit)
+        setNotification({
+          type: "success",
+          message: "Kisa luotu"
+        })
+        alertTimer()
       })
   };
 
