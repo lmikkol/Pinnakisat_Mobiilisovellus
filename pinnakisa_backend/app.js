@@ -21,13 +21,37 @@ async function updateProjectStatus() {
           { date_end: {$lt: nowDate} },
            { status: {$not:{ $eq: "archived" } } }
         ]},
-          { $set: { status: 'archived' } }
+          { $set: { status: 'archived' } },
+          { new: true }
       );
 
       if (project) {
-          console.log('Project status updated successfully:', project);
+          console.log('Contest status updated to archived successfully:', project);
       } else {
-          console.log('Project not found.');
+          console.log('Contest not archived not found.');
+      }
+  } catch (error) {
+      console.error('Error updating project status:', error);
+  }
+}
+
+async function updateStatusToActive() {
+  const nowDate = new Date()
+  try {
+      // Find the project and update its status
+      const project = await Contest.findOneAndUpdate(
+       { $and: [
+          { date_end: {$gt: nowDate} },
+          {date_start: {$lte: nowDate}},
+           { status: {$not:{ $eq: "active" } } }
+        ]},
+          { $set: { status: 'active' } }
+      );
+
+      if (project) {
+          console.log('Contests status updated to active successfully:', project);
+      } else {
+          console.log('Contests not active not found.');
       }
   } catch (error) {
       console.error('Error updating project status:', error);
@@ -43,6 +67,7 @@ mongoose.connect(config.MONGODB_URI)
   .then(async () => {
     logger.info('connected to MongoDB')
     await updateProjectStatus();
+    await updateStatusToActive();
   })
   .catch((error) => {
     logger.error('error connecting to MongoDB:', error.message)

@@ -6,7 +6,7 @@ import ContestCard from './ContestCard';
 import CustomInput from './CustomInput';
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
-import { registerLocale, setDefaultLocale } from "react-datepicker";
+import { registerLocale } from "react-datepicker";
 import { fi } from 'date-fns/locale/fi';
 registerLocale('fi', fi)
 
@@ -136,9 +136,6 @@ const ContestsPage = ({ contests, handleAddUserToContest, loggedinUser, handleRe
                           inputTitle={"URL"}
                         />
                       </div>
-
-
-                   
                   </Col>
                 </Row>
               </Modal.Body>

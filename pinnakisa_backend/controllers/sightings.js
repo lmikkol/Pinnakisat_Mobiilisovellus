@@ -56,7 +56,15 @@ sightingsRouter.post('/', async (request, response, next) => {
       const savedSighting = await newSighting.save();
   
       // Update the user's sightings with the new sighting
-      const updatedContest = await Contest.findByIdAndUpdate(body.contestId, { $addToSet: { sightings: savedSighting.id } }, { new: true }).populate('sightings');
+      const updatedContest = await Contest.findByIdAndUpdate(body.contestId, { $addToSet: { sightings: savedSighting.id } }, { new: true })
+      .populate({
+          path: 'sightings',
+          populate: {
+            path: 'userId',
+            model: 'User',
+            select: 'firstName lastName' // Specify the fields you want to select from the User model
+          }
+          })
   
       if (!updatedContest) {
         return response.status(404).json({ message: 'Contest not found' });

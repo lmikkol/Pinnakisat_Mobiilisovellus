@@ -1,7 +1,6 @@
 import pilyLogo from '../pilyLogo.png'
 
-const Header = ({ header, subheader }) =>
-{
+const Header = ({ header, subheader }) => {
   return (
     <div className="header-container">
       <div className="logo-container">

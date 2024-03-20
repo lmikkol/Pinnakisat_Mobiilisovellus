@@ -7,6 +7,7 @@ import Select from 'react-select';
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
 
+//Näitä käyttämättömiä ei saa poistaa
 import {
   groupedOptions, sorsalinnut, kanalinnut, kuikkalinnut, uikkulinnut, ulappalinnut, pelikaanilinnut, haikaralinnut,
   päiväpetolinnut, jalohaukkalinnut, kurkilinnut, rantalinnut, hietakanalinnut, kyyhkylinnut,
@@ -14,9 +15,7 @@ import {
 } from '../data/birds'
 
 
-function AddBirdModal({ showModal, setShowModal, contests, contestId, user }) {
-
-  const [isModalOpen, setIsModalOpen] = useState(false); // New state variable to track modal open/close
+function AddBirdModal({ showModal, setShowModal, contests, contestId, setContests, user, setNotification, alertTimer }) {
 
   const contestInit = {
     contestId: '',
@@ -29,7 +28,7 @@ function AddBirdModal({ showModal, setShowModal, contests, contestId, user }) {
   const [selectedBird, setSelectedBird] = useState([]);
   const [contestFormData, setContestFormData] = useState(contestInit)
   const [birdsDate, setBirdsDate] = useState(Array(selectedBird.length).fill());
-
+  const [limitDates, setLimitDates] =useState({})
   const handleCloseModal = () => {
     setShowModal(false)
     setContestFormData(contestInit);
@@ -37,15 +36,19 @@ function AddBirdModal({ showModal, setShowModal, contests, contestId, user }) {
     setSelectedBird([])
   }
 
-
-
   useEffect(() => {
     const thisContest = contests.find(contest => contest.id === contestId)
-    console.log("MUUTTUUU", thisContest)
-
+    console.log(thisContest)
     if (thisContest) {
+      setLimitDates(
+        {
+          "start": thisContest.date_begin,
+          "end": thisContest.date_end
+
+        }
+      )
+    
       const userSighting = thisContest.sightings.find(sighting => sighting.userId.id === user.id && sighting.contestId === contestId);
-      console.log(userSighting, "FUCK")
       if (userSighting) {
         setBirdsDate(userSighting.birdList.map(bird => bird.date));
         setSelectedBird(groupedOptions.reduce((acc, curr) => {
@@ -85,9 +88,7 @@ const handleSecInputChange = (event) => {
     [name]: value,
   }));
 };
-//console.log("user ennen",user)
 
-//EI NÄIN VAAN LUO UUSI TIETUE AIEMPIEN DATOJEN POHJALTA
 const handleSubmit = (event) => {
   event.preventDefault();
   let birdObject = { name: '', date: '' }
@@ -111,60 +112,37 @@ const handleSubmit = (event) => {
   }
 
   sightingService.createSighting(newObject).then(returnedContest => {
-    console.log(returnedContest, "TÄMÄ ON OIKEIN")
-    // const contestExists = user.sightings.some(sighting => sighting.contest === newObject.contestId);
-    // ////console.log(user, newObject.contestId)
+    returnedContest.sightings.map(sighting => {
+      sighting.contestId === returnedContest.id ? sighting.userId = {"firstName": user.firstName, "lastName": user.lastName, "id": user.id} : sighting
+    })
 
-    // if (!contestExists) {
-    //   //console.log("EI OLE OLEMASSA",returnedUser )
-    //   user.sightings.push({
-    //     contest: newObject.contestId,
-    //     distanceKM: newObject.kilometers,
-    //     spontaneous: newObject.spontaneous,
-    //     region: newObject.region,
-    //     hours: newObject.hours,
-    //     birdList: newObject.birds
-    //   });
-    // } else {
-    //   //console.log("ON OLEMASSA", returnedUser)
-    //   user.sightings = returnedUser.sightings.map(sighting => {
-    //     if (sighting.contest === contestFormData.contestId) {
-    //       let updatedSighting = returnedUser.sightings.filter(sighting => sighting.contest === newObject.contestId)[0]
-    //       //console.log(updatedSighting, "UPDATED SIGHTING")
-    //       return {
-    //         contest: updatedSighting.contest,
-    //         distanceKM: updatedSighting.distanceKM,
-    //         spontaneous: updatedSighting.spontaneous,
-    //         region: updatedSighting.region,
-    //         hours: updatedSighting.hours,
-    //         birdList: updatedSighting.birdList
-    //       };
-    //     }
-    //     return sighting;
-    //  }
-
-    //   setUser(user)
-    //    }
-
+    setContests(contests => 
+      contests.map(contest => 
+        contest.id === returnedContest.id ? returnedContest : contest
+      )
+    );
     setContestFormData(contestInit);
     setSelectedBird([]);
-    setBirdsDate(Array(selectedBird.length).fill())
-    // setAllUsers(prevUsers => {
-    //   const userIndex = prevUsers.findIndex(u => u.id === returnedUser.id);
-    //   if (userIndex !== -1) {
-    //     const updatedUsers = [...prevUsers];
-    //     updatedUsers[userIndex] = returnedUser;
-    //     return updatedUsers;
-    //   }
-    //   return prevUsers;
-    // });
+    setBirdsDate(Array(selectedBird.length).fill());
+    handleCloseModal();
+    setNotification({
+      type: "success",
+      message: "Havainnon lisääminen onnistui!"
+    });
+    alertTimer();
   })
+  .catch(error => {
+    console.error('Error creating sighting:', error);
+    setNotification({
+      type: "warning",
+      message: `Havainnon lisäyksessä tapahtui ongelma, yritä uudelleen.`
+    });
+    alertTimer();
+  }); 
 
   addingBirds = []
 
 };
-
-
 
 return (
 
@@ -180,8 +158,6 @@ return (
           <Modal.Body>
             <div className="form-group">
               <label htmlFor="formControlSelectBird">Valitse linnut</label>
-
-
               <div id="formControlSelectBird">
                 <Select
                   value={selectedBird}
@@ -200,25 +176,23 @@ return (
               <p>Valitse vähintään yksi lintu</p>
             ) : (
               <div>
-
-
                 <form onSubmit={handleSubmit}>
                   <div className="form-group">
                     <label htmlFor="formControlAddDates">Lisää havainnon päivämäärä</label>
-                    <div id="formControlAddDates">
+                    <div id="formControlAddDates" style={{ marginBottom: '0px' }}>
                       {selectedBird.map((item, index) => (
                        <div key={index}>
-                       <label >{selectedBird[index].label}</label>
+                       <label style={{ marginRight: '5px' }}>{selectedBird[index].label}</label>
                      <DatePicker
-                       selected={birdsDate[index]}
+                       selected={birdsDate[index] || new Date()}
                        onChange={date => handleSelectChange(index, { target: { name: "kilometers", value: date } })}
                        showIcon
                        dateFormat="dd/MM/yyyy"
                        placeholderText={'Havainnon päivämäärä'}
+                       minDate={limitDates.start}
+                       maxDate={limitDates.end}
                      />
                    </div>
-
-
                       ))}
                     </div>
                     <br />
@@ -226,7 +200,7 @@ return (
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="formControlAddDates">Lisää kuljetut kilometrit</label>
+                    <label htmlFor="formControlAddDates" style={{ marginBottom: '0px' }}>Lisää kuljetut kilometrit</label>
                     <div id="formControlAddDates">
                       <CustomInput
                         onChange={handleSecInputChange}
@@ -234,12 +208,13 @@ return (
                         name="kilometers"
                         type={'text'}
                         placeholder={'kilometrit'}
-                        inputTitle={"kilometrit"} />
+                        // inputTitle={"kilometrit"}
+                         />
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="formControlAddDates">Lisää spontaanit havainnot</label>
+                    <label htmlFor="formControlAddDates" style={{ marginBottom: '0px' }}>Lisää spontaanit havainnot</label>
                     <div id="formControlAddDates">
                       <CustomInput
                         onChange={handleSecInputChange}
@@ -247,12 +222,13 @@ return (
                         name="spontaneous"
                         type={'text'}
                         placeholder={'spondet'}
-                        inputTitle={'spondet'} />
+                        // inputTitle={'spondet'} 
+                        />
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="formControlAddDates">Lisää paikkakunta</label>
+                    <label htmlFor="formControlAddDates" style={{ marginBottom: '0px' }}>Lisää paikkakunta</label>
                     <div id="formControlAddDates">
                       <CustomInput
                         onChange={handleSecInputChange}
@@ -260,12 +236,13 @@ return (
                         name="region"
                         type={'text'}
                         placeholder={'region'}
-                        inputTitle={'region'} />
+                        // inputTitle={'region'} 
+                        />
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="formControlAddDates">Retkeillyt tunnit</label>
+                    <label htmlFor="formControlAddDates" style={{ marginBottom: '0px' }}>Retkeillyt tunnit</label>
                     <div id="formControlAddDates">
                       <CustomInput
                         onChange={handleSecInputChange}
@@ -273,14 +250,13 @@ return (
                         name="hours"
                         type={'text'}
                         placeholder={'hours'}
-                        inputTitle={'hours'} />
+                        // inputTitle={'hours'} 
+                        />
                     </div>
                   </div>
 
                 </form>
               </div>
-
-
             )
             }
           </Modal.Body>

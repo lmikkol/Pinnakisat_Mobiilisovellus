@@ -78,7 +78,14 @@ contestRouter.post('/', (request, response, next) => {
 contestRouter.get('/:id', (request, response) => {
 	// const id = request.params.id
 	// const contest = contests.find(contest => contest.id === id)
-	Contest.findById(request.params.id).then(contest => {
+	Contest.findById(request.params.id).populate({
+		path: 'sightings',
+		populate: {
+		  path: 'userId',
+		  model: 'User',
+		  select: 'firstName lastName' // Specify the fields you want to select from the User model
+		}
+	  }).then(contest => {
 		if (contest) {
 			response.json(contest)
 		} else {

@@ -1,10 +1,9 @@
-import Stack from 'react-bootstrap/Stack';
 import { useState } from 'react';
 
 import { useParams } from 'react-router-dom'; // Import useParams from React Router
 import { Fragment } from 'react';
 
-const UserScorePage = ({ users, contests }) => {
+const UserScorePage = ({ contests }) => {
   const [openRows, setOpenRows] = useState([]);
 
   const toggleRow = (rowIndex) => {
@@ -16,8 +15,6 @@ const UserScorePage = ({ users, contests }) => {
   };
 
   const id = useParams().id
-
-
   const thisContest = contests.filter(contest => contest.id === id)[0]
 
   if (!thisContest) {
@@ -26,24 +23,29 @@ const UserScorePage = ({ users, contests }) => {
 
   const thisSightings = thisContest.sightings
 
-
   thisSightings.sort((a, b) => b.birdList.length - a.birdList.length)
 
   if (thisSightings.length === 0) {
 
     return (
-      <><h2>{thisContest.name}</h2><p>No users have participated in this contest.</p></>)
+      <div style={{ minHeight: '100vh' }}>
+        <><h2>{thisContest.name}</h2><p>Kukaan osallistujista ei ole lisännyt havaintoja kilpailulle.</p></>
+      </div>
+    )
   }
 
   return (
-    <>
+    <div style={{ minHeight: '100vh' }}>
       <h2>{thisContest.name}</h2>
-      <table>
+      <p>
+        Painamalla osallistujan nimeä voit tarkastella osallistujan havaintoja.
+      </p>
+      <table style={{ margin: '0 auto', textAlign: 'left' }}>
         <thead>
           <tr>
-            <th>Osallistuja</th>
-            <th>Havainnot</th>
-            <th>Pisteet</th>
+            <th style={{ minWidth: '150px' }}>Osallistuja</th>
+            <th style={{ minWidth: '100px' }}></th>
+            <th style={{ minWidth: '80px' }}>Pisteet</th>
           </tr>
         </thead>
         <tbody>
@@ -56,20 +58,19 @@ const UserScorePage = ({ users, contests }) => {
                 {<td>{sighting.birdList.length}</td>}
               </tr>
               {openRows.includes(index) && (
+
                 <tr>
-                  <td />
+                  <tr style={{ fontWeight: 'bold' }}>Havainnot:</tr>
                   <td colSpan="2">
                     <div>
 
                       {sighting.birdList.map((bird, idx) => (
-                        <div key={idx}>
-                          {/* Render subrow content here */}
-                          {bird.name} {/* Example property */}
+                        <div key={idx} style={{ margin: '0 auto', textAlign: 'left' }}>
+                          {bird.name} 
                         </div>
                       ))
                       }
                     </div>
-
                   </td>
                 </tr>
               )}
@@ -77,7 +78,8 @@ const UserScorePage = ({ users, contests }) => {
           ))}
         </tbody>
       </table>
-    </>
+    </div>
+
   )
 }
 
