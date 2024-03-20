@@ -1,7 +1,7 @@
 import CustomInput from "./CustomInput"
 import Stack from 'react-bootstrap/Stack';
 import '../custom_styles.css';
-
+import { Button } from 'react-bootstrap'
 
 const LoginForm = ({ handleLogin, handleLoginInputChange, loginFormData }) => {
 
@@ -11,7 +11,7 @@ const LoginForm = ({ handleLogin, handleLoginInputChange, loginFormData }) => {
     <div>
       <Stack gap={1} className="text-center">
 
-        <h2>Kirjaudu</h2>
+        <h2>Kirjaudu sisään</h2>
 
         <form className="p-2" onSubmit={handleLogin} noValidate>
           <CustomInput
@@ -19,7 +19,7 @@ const LoginForm = ({ handleLogin, handleLoginInputChange, loginFormData }) => {
             value={loginFormData.email}
             name="email"
             type={'text'}
-            placeholder={'Sähköposti'}
+            placeholder={'nimi@esimerkki.com'}
             inputTitle={"Sähköposti"}
             isRequired={true}
           />
@@ -35,7 +35,7 @@ const LoginForm = ({ handleLogin, handleLoginInputChange, loginFormData }) => {
 
           />
 
-          <button type="submit">Kirjaudu</button>
+<Button variant="dark" type="submit">Kirjaudu</Button>
 
         </form>
       </Stack>

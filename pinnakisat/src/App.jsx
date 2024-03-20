@@ -15,6 +15,9 @@ import ContestsPage from './components/ContestsPage'
 import UserContestsPage from './components/UserContestsPage'
 import UserScorePage from './components/UserScorePage'
 import Button from 'react-bootstrap/Button'
+import Footer from './components/Footer'
+import sinitiainen from './sinitiainen.jpg';
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -30,7 +33,9 @@ const Home = () => {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <div>
-        <h2>PLACEHOLDER.</h2>
+        <h2>TERVETULOA PINNAKISAPALVELUUN!</h2>
+        <img src={sinitiainen} alt="sinitiainen" width={350} />
+        <p>kuva: pixabay</p>
       </div>
     </div>
   )
@@ -535,42 +540,39 @@ const App = () => {
   return (
     <><div>
 
-      <Header header={"Pinnakisapalvelu"} />
-      {NotificationMessages()}
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-        <div style={{ margin: '5px' }}>
-          <i>Pinnakisapalvelu, jossa käyttäjät voivat osallistua kilpailuihin ja lisätä lintuhavaintojaan.</i>
-        </div>
-      </div>
+<Header header="Pinnakisapalvelu" subheader="Pinnakisapalvelu, jossa käyttäjät voivat osallistua kilpailuihin ja lisätä lintuhavaintojaan." />
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', margin: '5px' }}>
-        <Link style={padding} to="/">Etusivu</Link>
-        <Link style={padding} to="/contests">Kilpailut</Link>
+{NotificationMessages()}
 
-        {loggedinUser ? (
-          <><Link style={padding} to="/usercontest">Omat kilpailut</Link>
-            <em className="text-center-align mt-1">{loggedinUser.name} logged in</em></>
-        ) : (
-          <><Link style={padding} to="/registration">Rekisteröidy</Link>
-            <Link style={padding} to="/login">Kirjaudu</Link></>
-        )}
+<div className="navbar">
+   <Link to="/">Etusivu</Link>
+    <Link to="/contests">Kilpailut</Link>
+    {loggedinUser ? (
+      <>
+        <Link to="/usercontest">Omat kilpailut</Link>
+        <em>{loggedinUser.name} kirjautunut sisään</em>
+      </>
+    ) : (
+      <>
+        <Link to="/registration">Rekisteröidy</Link>
+        <Link to="/login">Kirjaudu sisään</Link>
+      </>
+    )}
+    {loggedinUser && <Link to="/logout">Kirjaudu ulos</Link>}
+    <Link to="/contest-scores">Tulokset</Link>
+  </div>
 
-        {loggedinUser && <Link style={padding} to="/logout">LogOut</Link>}
-        {/* <Link style={padding} to="/contest-scores">Tulokset</Link> */}
-        {/* {loggedinUser && loggedinUser.userRole===0 && <Link style={padding} to="/add-contest">Lisää kilpailu</Link>} */}
-
-      </div>
 
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/contests" element={Contests()} />
-        <Route path="/contests/:id" element={contestScores()} />
-        <Route path="/usercontest" element={loggedinUser && userContests()} />
-        <Route path="/registration" element={registerForm()} />
-        <Route path="/login" element={loggedinUser ? <Home /> : <Login handleLogin={handleLogin} setLoginFormData={setLoginFormData} loginFormData={loginFormData} />} />
-        <Route path="/logout" Component={handleLogOut} />
-        <Route path="/contest-scores" element={contestScores()} />
-        {/* <Route path="/add-contest" element={loggedinUser && contestForm()}/> */}
+          <Route path="/" element={<Home />} />
+          <Route path="/contests" element={Contests()}/>
+          <Route path="/contests/:id" element={contestScores()} />
+          <Route path="/usercontest" element={loggedinUser && userContests()} />
+          <Route path="/registration" element={registerForm()}/>
+          <Route path="/login" element={loggedinUser ? <Home/> : <Login handleLogin={handleLogin} setLoginFormData={setLoginFormData} loginFormData={loginFormData} />}/>
+          <Route path="/logout" Component={handleLogOut}/>
+          <Route path="/contest-scores" element={contestScores()}/>
+          <Route path="/add-contest" element={loggedinUser && contestForm()}/>
       </Routes>
 
       {/* <Button name="65edc0fa4db8f95db486d907" type="button" className="btn btn-warning" onClick={(event) => handleFindUserContest(event)}>
@@ -580,6 +582,8 @@ const App = () => {
       {/* Muuttaa näkymää kirjautuneelle käyttäjälle */}
       {/* {loggedinUser && contestForm()} */}
       {loggedinUser && birdSightModal()}
+
+      <Footer />
 
     </div></>
   )
