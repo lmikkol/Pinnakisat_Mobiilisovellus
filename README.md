@@ -10,11 +10,18 @@ EN: Web application for managing, publishing and participating to contests creat
 
 The service is implemented with Javascript using the following technologies: React-vite libraries(frontend) and Node.Js(backend). MongoDB has served as the application's database.
 
+## Linkit
+
+- [Infoa Sovelluksesta](https://github.com/lmikkol/Pinnakisat_Mobiilisovellus/blob/main/Dokumentaatio/Infoa%20Sovelluksesta.md)
+- [Kuvakkeita](https://github.com/lmikkol/Pinnakisat_Mobiilisovellus/blob/main/Kuvakkeita.md)
+
+
 ## | Tekniset vaatimukset/Technical requirements |
 
 - **Node.Js**
 - **NPM**
 - **MongoDB**
+
 
 
 ## Asentaminen && käynnistäminen/Install && How to run
