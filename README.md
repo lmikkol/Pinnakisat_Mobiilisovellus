@@ -19,7 +19,7 @@ The service is implemented with Javascript using the following technologies: Rea
 ## | Tekniset vaatimukset/Technical requirements |
 
 - **Node.Js**
-- **NPM**
+- **React-Vite**
 - **MongoDB**
 
 
