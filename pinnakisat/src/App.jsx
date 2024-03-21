@@ -285,6 +285,8 @@ const App = () => {
     }));
   }
 
+  // handleRegistration sähköpostin vaatimukset
+  // ehtolauseketta varten
   const isValidEmail = (email) => {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return pattern.test(email)
@@ -481,7 +483,7 @@ const App = () => {
   }
   //#endregion FORMIT!!! END
 
-
+  // !!!ÄLÄ POISTA MISSÄÄN NIMESSÄ, VOI HAJOITTAA KOKO SOVELLUKSEN!!!
   const [contest, setContest] = useState(null)
 
   return (
