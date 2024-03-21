@@ -28,7 +28,7 @@ The service is implemented with Javascript using the following technologies: Rea
 
 Palvelun käynnistämiseksi kloonaa ensin sovelluksen Git -repositorio, jonka jälkeen navigoi itsesi hakemistosijaintiin, jossa pinnakisat ja pinnakisa_backend hakemisto ovat.
 
-Avaa konsoli molempiin hakemistoihin, suositellusti avaten '**Git Bash**'.
+Avaa konsoli molempiin hakemistoihin.
 
 
 Ensimmäisellä komennolla asennetaan sovelluksen riippuvuudet:
