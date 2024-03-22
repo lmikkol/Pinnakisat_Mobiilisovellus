@@ -58,6 +58,7 @@ Kun nämä on määritetty syötä komento hakemistoissa avattuihin konsoleihin
 Näin olet avannut itsellesi pääsyn localhost:5173 ja localhost:{Port}
 **localhost:5173** on käyttöliittymän sivu, kun taas localhost{Port} käsittelee backendin toimintaa. Sitä tarvitaan kuitenkin, jotta sivusto toimii.
 
+**Admin (ylläpitäjä) käyttäjälle on luotu valmis pohja placeholdereilla backendin createUser.rest tiedostoon.**
 
 # || Ominaisuudet/Features ||
 
