@@ -1,22 +1,13 @@
 
-POST http://localhost:3001/api/users
-Content-Type: application/json
-
-{
-    "email": "basic@test.com",
-    "firstName": "basic",
-    "lastName": "dude",
-    "password": "basicM"
-}
-
-###
+//Admin käyttäjän pohja!
 
 POST http://localhost:3001/api/users
 Content-Type: application/json
 
 {
-    "email": "testUser@testing.com",
-    "firstName": "test",
-    "lastName": "mate",
-    "password": "testinG"
+    "email": "Admin@email.com",
+    "firstName": "Teko",
+    "lastName": "Aly",
+    "password": "4AdminYP",
+    "role": 0
 }

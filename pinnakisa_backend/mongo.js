@@ -6,9 +6,10 @@ if (process.argv.length < 3) {
 }
 
 const password = process.argv[2]
+const userName = process.argv[3]
 
 const url =
-	`mongodb+srv://KuumaTanssi:${password}@cluster0.rbci3un.mongodb.net/pinnakisat?retryWrites=true&w=majority`
+	`mongodb+srv://${userName}:${password}@cluster0.rbci3un.mongodb.net/mesta?retryWrites=true&w=majority`
 
 mongoose.set('strictQuery', false)
 mongoose.connect(url)
