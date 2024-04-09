@@ -94,6 +94,7 @@ const App = () => {
     firstName: '',
     lastName: '',
     password: '',
+    role: 1,
     passwordAgain: ''
   }
   //#endregion STATE CREDENTIALS END

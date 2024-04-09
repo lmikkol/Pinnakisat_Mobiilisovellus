@@ -94,7 +94,7 @@ usersRouter.put('/leavecontest/:contestId/:userId', async (req, res) => {
 
 usersRouter.post('/', async (request, response) => {
   console.log(request.body.registerFormData)
-  const { email, firstName, lastName, password } = request.body.registerFormData
+  const { email, firstName, lastName, password, role } = request.body.registerFormData
 
 
   if (!isValidPassword(password)) {
@@ -108,6 +108,7 @@ usersRouter.post('/', async (request, response) => {
     email,
     firstName,
     lastName,
+    role,
     passwordHash,
   })
 

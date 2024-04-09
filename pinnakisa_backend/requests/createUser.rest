@@ -1,13 +1,13 @@
 
-//Admin käyttäjän pohja!
-
 POST http://localhost:3001/api/users
 Content-Type: application/json
 
 {
-    "email": "Admin@email.com",
-    "firstName": "Teko",
-    "lastName": "Aly",
-    "password": "4AdminYP",
-    "role": 0
+    "registerFormData": {
+        "email": "Admin@admin.com",
+        "firstName": "Teko",
+        "lastName": "Aly",
+        "password": "4AdminYP",
+        "role": 0
+        }
 }

@@ -26,7 +26,6 @@ const userSchema = mongoose.Schema({
   },
   role: {
     type: Number,
-    required: true,
     default: 1
   },
   contests: [
